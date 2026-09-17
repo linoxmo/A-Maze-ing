@@ -1,9 +1,11 @@
-import sys
-from parsing import create_conf
-from typing import Optional
-import os
-from dotenv import load_dotenv
-
+try:
+    import sys
+    from parsing import create_conf
+    from typing import Optional
+    import os
+    from dotenv import load_dotenv
+except Exception as e:
+     print(e)
 
 def get_variable(name: str, default: Optional[str] = None) -> str:
     value = os.getenv(name, default)
