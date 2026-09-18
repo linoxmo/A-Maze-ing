@@ -1,22 +1,19 @@
-from pymlx import Mlx, Color
+from pymlx import Mlx
 from dotenv import load_dotenv
 from parsing import get_variable
-
-class Maze():
-    def __init__(self, maze: str, entry: str, exit: str, path: str) -> None:
-        self._maze = maze
-        self._entry = entry
-        self._exit = exit
-        self._path = path
+import os
+from typing import Any
 
 def prep() -> str:
     load_dotenv()
     fichier = get_variable("OUTPUT_FILE")
     with open(fichier, "r") as file:
+        if os.path.getsize(fichier) == 0:
+            raise Exception("Erreur: Le fichier est vide")
         lab = file.read()
         return (lab)
 
-def cell_walls(hex_char):
+def cell_walls(hex_char: str) -> dict[str,bool]:
     v = int(hex_char, 16)
     return {
         'N': bool(v & 0b0001),
@@ -32,7 +29,7 @@ def draw_line(img, x0, y0, x1, y1, color):
     sy = 1 if y0 < y1 else -1
     err = dx + dy
     while True:
-        img.pixel_put(x0, y0, color)   
+        img.pixel_put(x0, y0, color)
         if x0 == x1 and y0 == y1:
             break
         e2 = 2 * err
@@ -43,88 +40,115 @@ def draw_line(img, x0, y0, x1, y1, color):
             err += dx
             y0 += sy
 
-TILE = 32
-OFFSET_X = 50
-OFFSET_Y = 100
-def draw_maze(img, grid, draw_line):
-    WALL_COLOR = 0xFFFFFF
-    for y, row in enumerate(grid):
-        for x, ch in enumerate(row):
-            w = cell_walls(ch)
-            px, py = x * TILE + OFFSET_X, y * TILE + OFFSET_Y
-            if w['N']: draw_line(img, px, py, px + TILE, py, WALL_COLOR)
-            if w['S']: draw_line(img, px, py + TILE, px + TILE, py + TILE, WALL_COLOR)
-            if w['W']: draw_line(img, px, py, px, py + TILE, WALL_COLOR)
-            if w['E']: draw_line(img, px + TILE, py, px + TILE, py + TILE, WALL_COLOR)
+class Maze():
+    def __init__(self, mlx: Any, win: Any, img: Any, width: int, height: int) -> None:
+        self.mlx: Any = mlx
+        self.win: Any = win
+        self.img: Any = img
+        self.width: int = width
+        self.height: int = height
+        self.maze:  list[str]
+        self.entry: tuple[int, ...]
+        self.exit:  tuple[int, ...]
+        self.path: str
+        self.show_path: bool = False
+        self.offset_X: int = 50
+        self.offset_Y: int = 100
+        self.tile: int = 32
 
-def draw_path(img, start, path, draw_line):
-    MOVES = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'W': (-1, 0)}
-    PATH_COLOR = 0xFF0000
-    x, y = start
-    for move in path:
-        dx, dy = MOVES[move]
-        cx1, cy1 = (x * TILE + TILE // 2) + OFFSET_X , (y * TILE + TILE // 2) + OFFSET_Y
-        x, y = x + dx, y + dy
-        cx2, cy2 = (x* TILE + TILE // 2) + OFFSET_X, (y * TILE + TILE // 2) + OFFSET_Y
-        draw_line(img, cx1, cy1, cx2, cy2, PATH_COLOR)
+        self.close_btn: dict[str,int] = {"x": 900, "y": 10, "w": 80, "h": 30}
+        self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
+
+    def load(self):
+        lab = prep()
+        tab_lab = lab.split("\n")
+        self.maze = tab_lab[0:15:1]
+        self.entry = tuple(int(d) for d in tab_lab[16].split(","))
+        self.exit = tuple(int(d) for d in tab_lab[17].split(","))
+        self.path = tab_lab[18]
+
+    def render(self):
+        ENTRY_COLOR = 0x00FF00
+        EXIT_COLOR = 0xFF0000
+        self.img = self.mlx.new_image(self.width, self.height)
+        self.draw_maze()
+        self.draw_closed_cells()
+        self.fill_cell(self.entry[0], self.entry[1], ENTRY_COLOR)
+        self.fill_cell(self.exit[0], self.exit[1], EXIT_COLOR)
+        if self.show_path:
+            self.draw_path()
+        self._draw_button(self.close_btn, 0xFFFFFF)
+        self._draw_button(self.toggle_btn, 0x0000FF)
+
+    def _draw_button(self, btn, color):
+        for dy in range(btn["h"]):
+            for dx in range(btn["w"]):
+                self.img.pixel_put(btn["x"] + dx, btn["y"] + dy, color)
+
+    def redraw(self):
+        self.win.put_image(self.img)
+        self.win.string_put(self.close_btn["x"] + 15, self.close_btn["y"] + 20, 0x00FF00, "Fermer")
+        self.win.string_put(self.toggle_btn["x"] + 5, self.toggle_btn["y"] + 20, 0xFFFFFF, "Chemin")
+
+    def on_mouse_click(self, btn, x, y):
+        if self._is_in(x, y, self.close_btn):
+            self.mlx.loop_end()
+        elif self._is_in(x, y, self.toggle_btn):
+            self.show_path = not self.show_path
+            self.render()
+
+    def draw_maze(self):
+        WALL_COLOR = 0xFFFFFF
+        for y, row in enumerate(self.maze):
+            for x, ch in enumerate(row):
+                w = cell_walls(ch)
+                px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
+                if w['N']: draw_line(self.img, px, py, px + self.tile, py, WALL_COLOR)
+                if w['S']: draw_line(self.img, px, py + self.tile, px + self.tile, py + self.tile, WALL_COLOR)
+                if w['W']: draw_line(self.img, px, py, px, py + self.tile, WALL_COLOR)
+                if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, WALL_COLOR)
+
+    def draw_closed_cells(self, color=0x808080):
+        for y, row in enumerate(self.maze):
+            for x, ch in enumerate(row):
+                w = cell_walls(ch)
+                if all(w.values()):
+                    self.fill_cell(x, y, color, margin=2)
+
+    def draw_path(self):
+        MOVES = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'W': (-1, 0)}
+        PATH_COLOR = 0xFF0000
+        x, y = self.entry
+        for move in self.path:
+            dx, dy = MOVES[move]
+            cx1, cy1 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
+            x, y = x + dx, y + dy
+            cx2, cy2 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
+            draw_line(self.img, cx1, cy1, cx2, cy2, PATH_COLOR)
+
+    def fill_cell(self, x, y, color, margin=2):
+        px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
+        for dy in range(margin, self.tile - margin):
+            for dx in range(margin, self.tile - margin):
+                self.img.pixel_put(px + dx, py + dy, color)
+
+    @staticmethod
+    def _is_in(x, y, btn):
+        return btn["x"] <= x <= btn["x"] + btn["w"] and btn["y"] <= y <= btn["y"] + btn["h"]
 
 
-
-def fill_cell(img, x, y, color, margin=2):
-    px, py = x * TILE + OFFSET_X, y * TILE + OFFSET_Y
-    for dy in range(margin, TILE - margin):
-        for dx in range(margin, TILE - margin):
-            img.pixel_put(px + dx, py + dy, color)
-
-def show_lab() :
-   
-    
-    ENTRY_COLOR = 0x00FF00   # vert
-    EXIT_COLOR = 0xFF0000    # rouge
-    try:
-        labyrinth = prep()
-        tab_labyrinth = labyrinth.split("\n")
-        grid = tab_labyrinth[0:15:1]
-        draw_maze(img, grid, draw_line)
-        start = tuple(int(d) for d in tab_labyrinth[16].split(","))
-        x,y = start
-        fill_cell(img, x, y, ENTRY_COLOR, margin=2)
-        end = tuple(int(d) for d in tab_labyrinth[17].split(","))
-        x,y = end
-        fill_cell(img, x, y, EXIT_COLOR, margin=2)
-        path = tab_labyrinth[18]
-        draw_path(img,start,path,draw_line)
-        win.on_mouse(on_mouse_click)
-        win.put_image(img)
-
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-
-CLOSE_BTN = {"x": 900, "y": 10, "w": 80, "h": 30}
-CLOSE_COLOR = 0xFF0000
-
-def draw_close_button(img):
-    for dy in range(CLOSE_BTN["h"]):
-        for dx in range(CLOSE_BTN["w"]):
-            img.pixel_put(CLOSE_BTN["x"] + dx, CLOSE_BTN["y"] + dy, CLOSE_COLOR)
-        win.string_put(CLOSE_BTN["x"] + 15, CLOSE_BTN["y"] + 20, 0x00FF00, "Fermer")
-
-def is_in_button(x, y, btn):
-    return btn["x"] <= x <= btn["x"] + btn["w"] and btn["y"] <= y <= btn["y"] + btn["h"]
-
-def on_mouse_click(button, x, y):
-    if is_in_button(x, y, CLOSE_BTN):
-        mlx.loop_end()
-    
 if __name__ == '__main__':
     mlx = Mlx()
     WIDTH = 1000
-    HEIGHT = 1000   
+    HEIGHT = 1000
     win = mlx.new_window(WIDTH, HEIGHT, "Labyrinthe")
     img = mlx.new_image(WIDTH, HEIGHT)
-    
-    show_lab()
+
+    maze = Maze(mlx, win, img, WIDTH, HEIGHT)
+    maze.load()
+    maze.render()
+
+    win.on_mouse(maze.on_mouse_click)
+    mlx.on_loop(maze.redraw)
     win.on_close(mlx.loop_end)
     mlx.loop()
