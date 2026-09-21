@@ -1,3 +1,5 @@
+from token import OP
+
 from pydantic import BaseModel, Field, field_validator
 from dotenv import load_dotenv
 from typing import Annotated, Optional
@@ -15,6 +17,28 @@ class Config(BaseModel):
     def show_config(self):
         for value in self.model_dump().values():
             print(value)
+
+    def get_width(self) -> int:
+        return self.width
+
+    def get_height(self) -> int:
+        return self.height
+
+    def get_entry(self) -> tuple[Cord,Cord]:
+        return self.entry
+
+    def get_exit(self) -> tuple[Cord, Cord]:
+        return self.exit
+
+    def get_o_file(self) -> str:
+        return self.o_file
+
+    def get_is_perfect(self) -> bool:
+        return self.is_perfect
+
+    def get_seed(self) -> Optional[int]:
+        return self.seed
+    
 
 
 def get_variable(name: str, default: Optional[str] = None) -> str:

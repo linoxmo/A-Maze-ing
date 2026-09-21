@@ -1,19 +1,14 @@
-try:
+def new_import() -> tuple: 
     import sys
     from parsing import create_conf
-    from typing import Optional
-    import os
-    from dotenv import load_dotenv
-except Exception as e:
-     print(e)
-
-def get_variable(name: str, default: Optional[str] = None) -> str:
-    value = os.getenv(name, default)
-    if value is None:
-        return "Missing"
-    return value
+    return sys, create_conf
 
 def main() -> None:
+    try:
+        sys, create_conf = new_import()
+    except Exception as e:
+        print(e)
+        return
     if len(sys.argv) != 2:
             print("Error: input should be \' python3 a_maze_ing.py config.txt \'")
             return
