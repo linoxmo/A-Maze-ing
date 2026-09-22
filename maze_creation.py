@@ -13,6 +13,7 @@ class MazeGenerator():
         self._seed = new_conf.get_seed()
         self.maze : list[list[int]]
         self.sol : str = ""
+        self.path: str = ""
 
     def init_maze(self) -> list[list[int]]:
         self.maze =  [[ 1 for _ in range(self._width)] for _ in range (self._height)]
@@ -38,7 +39,7 @@ class MazeGenerator():
 
     def is_wall(self, i, j) -> bool:
         if i < 0 or i >= self._height or j < 0 or j >= self._width:
-            return True  # hors de la grille = mur fermé
+            return True
         return self.maze[i][j] == 1
 
     def convert_maze(self):
@@ -47,12 +48,19 @@ class MazeGenerator():
         for i in range(0, self._height, 2):      
             for j in range(0, self._width, 2):
                 value = 0
-                if self.is_wall(i - 1, j): value |= 1   # Nord
-                if self.is_wall(i, j + 1): value |= 2   # Est
-                if self.is_wall(i + 1, j): value |= 4   # Sud
-                if self.is_wall(i, j - 1): value |= 8   # Ouest
+                if self.is_wall(i - 1, j): 
+                    value |= 1 
+                if self.is_wall(i, j + 1): 
+                    value |= 2
+                if self.is_wall(i + 1, j): 
+                    value |= 4
+                if self.is_wall(i, j - 1): 
+                    value |= 8
                 self.sol += hex_digits[value]
             self.sol += "\n"
+
+    def  solution (self) -> str:
+        return ("path")
 
 
 
