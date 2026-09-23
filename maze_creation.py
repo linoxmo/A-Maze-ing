@@ -27,9 +27,44 @@ class MazeGenerator():
             nx, ny = x + dx, y +dy
             if 0 <= nx < self._width and 0 <= ny < self._height:
                 if self.maze[ny][nx] == 1:
-                    print(f"de ({x},{y}) vers ({nx},{ny}), mur creusé à ligne={y+dy//2} col={x+dx//2}")
+                    #print(f"de ({x},{y}) vers ({nx},{ny}), mur creusé à ligne={y+dy//2} col={x+dx//2}")
                     self.maze[y + dy // 2 ][x + dx // 2] = 0 
                     self.dfs(nx,ny)
+
+    def build_pattern(self) -> list[str]:
+        digit_4 = ["101", "101", "111", "001", "001"]
+        digit_2 = ["111", "001", "111", "100", "111"]
+        return [d4 + "0" + d2 for d4, d2 in zip(digit_4, digit_2)]
+
+    def blocked_cells(self):
+        pattern = self.build_pattern()
+        p_h, p_w = len(pattern), len(pattern[0])
+        n_rows = (self._height + 1) // 2   # nb de cellules réelles en hauteur
+        n_cols = (self._width + 1) // 2    # nb de cellules réelles en largeur
+
+        if n_rows < p_h or n_cols < p_w:
+            print("Labyrinthe trop petit pour le motif 42, motif ignoré")
+            return set()
+
+        start_row = (n_rows - p_h) // 2
+        start_col = (n_cols - p_w) // 2
+
+        blocked = set()
+        for r, row in enumerate(pattern):
+            for c, ch in enumerate(row):
+                if ch == '1':
+                    blocked.add((start_row + r, start_col + c))
+        return blocked
+
+    def apply_pattern_blocks(self):
+        for (r, c) in self.blocked_cells():
+            row, col = r * 2, c * 2   # conversion coordonnées compactes -> espace DFS
+            self.maze[row][col] = 2   # 2 = "bloqué", jamais creusé
+    """
+    def bfs(self) -> None :
+        self._entry[][] = 0
+        pass
+    """
 
     def create_maze(self, x , y) -> list[list[int]]:
         rd.seed(42)
@@ -59,17 +94,17 @@ class MazeGenerator():
                 self.sol += hex_digits[value]
             self.sol += "\n"
 
-    def  solution (self) -> str:
-        return ("path")
 
 
 
 if __name__ == '__main__':
     maze = MazeGenerator()
+    maze.apply_pattern_blocks()
     grille = maze.create_maze(0,0)
     print(grille[1][1], grille[1][0], grille[0][1])
     for ligne in grille:
         texte = "".join(["#" if c == 1 else ("P" if c == "P" else " ") for c in ligne])
         print(texte)
     maze.convert_maze()
-    print(maze.sol)
+    for k in maze.build_pattern():
+        print(k)
