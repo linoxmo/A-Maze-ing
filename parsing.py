@@ -49,8 +49,7 @@ def get_variable(name: str, default: Optional[str] = None) -> str:
 
 load_dotenv()
 Cord = Annotated[int, Field(ge = 0, le = \
-    max(int(get_variable("WIDTH")) - 1, int(get_variable("HEIGHT")) -1 ))] 
-
+max(int(get_variable("WIDTH")) - 1, int(get_variable("HEIGHT")) -1 ))] 
 
 def create_conf() -> Config:
     entry = get_variable("ENTRY").split(",")
