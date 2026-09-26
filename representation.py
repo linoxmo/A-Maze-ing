@@ -136,18 +136,15 @@ class Maze():
     def _is_in(x, y, btn):
         return btn["x"] <= x <= btn["x"] + btn["w"] and btn["y"] <= y <= btn["y"] + btn["h"]
 
-
-if __name__ == '__main__':
+def mlx_rendering() -> None:
     mlx = Mlx()
     WIDTH = 1000
     HEIGHT = 1000
     win = mlx.new_window(WIDTH, HEIGHT, "Labyrinthe")
     img = mlx.new_image(WIDTH, HEIGHT)
-
     maze = Maze(mlx, win, img, WIDTH, HEIGHT)
     maze.load()
     maze.render()
-
     win.on_mouse(maze.on_mouse_click)
     mlx.on_loop(maze.redraw)
     win.on_close(mlx.loop_end)

@@ -1,6 +1,4 @@
-from token import OP
-
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from typing import Annotated, Optional
 import os
@@ -14,7 +12,7 @@ class Config(BaseModel):
     is_perfect: bool 
     seed:Optional[int] = Field(default = None , ge = 0)
 
-    def show_config(self):
+    def show_config(self) -> None:
         for value in self.model_dump().values():
             print(value)
 
