@@ -1,6 +1,3 @@
-from representation import mlx_rendering
-
-
 def new_import() -> list: 
     import sys
     from maze_creation import MazeGenerator as mg
@@ -9,7 +6,7 @@ def new_import() -> list:
 
     tab_import = [sys, mg, mlxr, output]
     return tab_import
-    
+
 
 def main() -> None:
     try:
@@ -35,11 +32,4 @@ def main() -> None:
     return
 
 if __name__ == "__main__":
-
     main()
-    """
-    data = ["hello"]
-    exemple = ("hey", "hou","haha")
-    data.extend(exemple)
-    print(*data, sep= "\n")
-    """
