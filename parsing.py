@@ -114,6 +114,4 @@ def create_conf() -> Config:
         )
 
 
-# Creer le venv et pip install all puis pour installer le Mlx :
-# python3 -m pip install minilibx-python
 # python3 a_maze_ing.py .env
