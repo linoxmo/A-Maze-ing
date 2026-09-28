@@ -3,13 +3,17 @@ from dotenv import load_dotenv
 from typing import Optional
 import os
 
+
+load_dotenv()
+
+
 class Config(BaseModel):
     width: int = Field(ge=2, le=50)
-    height: int = Field(ge=2, le=50) 
+    height: int = Field(ge=2, le=50)
     entry:tuple[int, int]
     exit: tuple[int, int]
-    o_file: str 
-    is_perfect: bool 
+    o_file: str
+    is_perfect: bool
     seed:Optional[int] = Field(default = None , ge = 0)
 
     @model_validator(mode = "after")
@@ -20,7 +24,7 @@ class Config(BaseModel):
         if self.entry == self.exit:
             raise ValueError("entry and exit must be different")
         return self
-    
+
     def show_config(self) -> None:
         for value in self.model_dump().values():
             print(value)
@@ -52,7 +56,6 @@ def get_variable(name: str, default: Optional[str] = None) -> str:
         return "Missing"
     return value
 
-load_dotenv()
 
 def create_conf() -> Config:
     entry = get_variable("ENTRY").split(",")
@@ -69,7 +72,7 @@ def create_conf() -> Config:
             is_perfect= get_variable("PERFECT").lower() == "true",
             seed = int(get_variable("SEED"))
         )
-    else : 
+    else :
         return Config(
                     width = int(get_variable("WIDTH")),
                     height = int(get_variable("HEIGHT")),
