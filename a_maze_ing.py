@@ -8,15 +8,15 @@ def new_import() -> list:
         xxx
     """
     import sys
-    from maze_creation import MazeGenerator as mg
-    from maze_creation import output
+    from maze import MazeGenerator as mg
+    from maze import output
     from representation import mlx_rendering as mlxr
 
     tab_import = [sys, mg, mlxr, output]
     return tab_import
 
 
-if __name__ == "__main__":
+def main() -> None:
     """ Function to xxx
 
     Args:
@@ -45,4 +45,7 @@ if __name__ == "__main__":
         mlxr()
     except Exception as e:
         print(e)
-    return
+
+
+if __name__ == "__main__":
+    main()
