@@ -64,6 +64,14 @@ class Config(BaseModel):
 
 
 def get_variable(name: str, default: Optional[str] = None) -> str:
+    """ Function to get the value of the .env environnment variables
+
+    Args:
+        name of the environnement variable
+
+    Returns:
+        value of the named environnement variable 
+    """
     value = os.getenv(name, default)
     if value is None:
         return "Missing"
@@ -71,6 +79,14 @@ def get_variable(name: str, default: Optional[str] = None) -> str:
 
 
 def create_conf() -> Config:
+    """ Function to iniate a Config with the environnment variables
+
+    Args:
+        None
+
+    Returns:
+        Config object
+    """
     entry = get_variable("ENTRY").split(",")
     exit = get_variable("EXIT").split(",")
     seed = get_variable("SEED")
