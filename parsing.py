@@ -1,17 +1,26 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
-from typing import Annotated, Optional
+from typing import Optional
 import os
 
 class Config(BaseModel):
     width: int = Field(ge=2, le=50)
     height: int = Field(ge=2, le=50) 
-    entry:tuple[Cord, Cord]
-    exit: tuple[Cord, Cord]
+    entry:tuple[int, int]
+    exit: tuple[int, int]
     o_file: str 
     is_perfect: bool 
     seed:Optional[int] = Field(default = None , ge = 0)
 
+    @model_validator(mode = "after")
+    def check_coordinates(self) -> "Config":
+        for name, (x, y) in (("entry", self.entry), ("exit", self.exit)):
+            if not (0 <= x < self.width and 0 <= y < self.height):
+                raise ValueError(f"{name} {(x, y)} is outside the maze")
+        if self.entry == self.exit:
+            raise ValueError("entry and exit must be different")
+        return self
+    
     def show_config(self) -> None:
         for value in self.model_dump().values():
             print(value)
@@ -22,10 +31,10 @@ class Config(BaseModel):
     def get_height(self) -> int:
         return self.height
 
-    def get_entry(self) -> tuple[Cord,Cord]:
+    def get_entry(self) -> tuple[int,int]:
         return self.entry
 
-    def get_exit(self) -> tuple[Cord, Cord]:
+    def get_exit(self) -> tuple[int, int]:
         return self.exit
 
     def get_o_file(self) -> str:
@@ -36,8 +45,6 @@ class Config(BaseModel):
 
     def get_seed(self) -> Optional[int]:
         return self.seed
-    
-
 
 def get_variable(name: str, default: Optional[str] = None) -> str:
     value = os.getenv(name, default)
@@ -46,16 +53,11 @@ def get_variable(name: str, default: Optional[str] = None) -> str:
     return value
 
 load_dotenv()
-Cord = Annotated[int, Field(ge = 0, le = \
-max(int(get_variable("WIDTH")) - 1, int(get_variable("HEIGHT")) -1 ))] 
 
 def create_conf() -> Config:
     entry = get_variable("ENTRY").split(",")
     exit = get_variable("EXIT").split(",")
     seed = get_variable("SEED")
-
-    if entry == exit:
-        raise ValueError("The exit can't be at the same place as the entree !")
 
     if seed != "Missing":
         return Config(

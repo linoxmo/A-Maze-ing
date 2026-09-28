@@ -1,6 +1,4 @@
-from tkinter import Y
-
-from parsing import create_conf,Config, Cord
+from parsing import create_conf,Config
 import random as rd
 from collections import deque as dq
 
@@ -9,8 +7,8 @@ class MazeGenerator():
         new_conf: Config = create_conf()
         self._width: int = new_conf.get_width() * 2
         self._height: int = new_conf.get_height() * 2 
-        entry: tuple[ Cord, Cord]= new_conf.get_entry()
-        exit: tuple[Cord, Cord] = new_conf.get_exit()
+        entry: tuple[ int, int]= new_conf.get_entry()
+        exit: tuple[int, int] = new_conf.get_exit()
         self._entry: tuple[int, int] = (entry[0] * 2, entry[1] * 2)
         self._exit: tuple[int, int] = (exit[0] * 2, exit[1] * 2)
         self._isperfect: bool = new_conf.get_is_perfect()
@@ -27,10 +25,10 @@ class MazeGenerator():
     def get_height(self) -> int:
         return self._height
 
-    def get_entry(self) -> tuple[Cord, Cord]:
+    def get_entry(self) -> tuple[int, int]:
         return self._entry
 
-    def get_exit(self) -> tuple[Cord, Cord]:
+    def get_exit(self) -> tuple[int, int]:
         return self._exit
 
     def get_isperfect(self) -> bool:
@@ -97,7 +95,7 @@ class MazeGenerator():
               
     def create_maze(self, x , y) -> list[list[int]]:
         seed: int | None = self.get_seed()
-        if not type(seed) == "None":
+        if seed is not None:
             print(seed)
             rd.seed(seed)
         self.init_maze()
