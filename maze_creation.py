@@ -19,38 +19,17 @@ class MazeGenerator():
         self.sol : str = ""
         self.path: str = ""
 
-    def get_width(self) -> int:
-        return self._width
-
-    def get_height(self) -> int:
-        return self._height
-
-    def get_entry(self) -> tuple[int, int]:
-        return self._entry
-
-    def get_exit(self) -> tuple[int, int]:
-        return self._exit
-
-    def get_isperfect(self) -> bool:
-        return self._isperfect
-
-    def get_seed(self) -> int | None:
-        return self._seed
-
-    def get_o_file(self) -> str:
-        return self.o_file
-
     def get_directions(self) -> list[tuple[int,int]]:
         return list(self._directions)
 
     def init_maze(self) -> list[list[int]]:
-        self.maze: list[list[int]] =  [[ 1 for _ in range(self.get_width())] for _ in range (self.get_height())]
+        self.maze: list[list[int]] =  [[ 1 for _ in range(self._width)] for _ in range (self._height)]
 
         return self.maze
     
     def dfs(self, x , y) -> None:
-        w: int = self.get_width()
-        h: int = self.get_height()
+        w: int = self._width
+        h: int = self._height
         self.maze[y][x] = 0
         directions = self.get_directions()
         rd.shuffle(directions)
@@ -94,14 +73,14 @@ class MazeGenerator():
             self.maze[row][col] = 2   
               
     def create_maze(self, x , y) -> list[list[int]]:
-        seed: int | None = self.get_seed()
+        seed: int | None = self._seed
         if seed is not None:
             print(seed)
             rd.seed(seed)
         self.init_maze()
         self.apply_pattern_blocks()
         self.dfs(x, y)
-        en_x, en_y = self.get_entry()
+        en_x, en_y = self._entry
         self.bfs(en_x, en_y)
         return self.maze
 
@@ -142,7 +121,7 @@ class MazeGenerator():
              return("None")
 
     def bfs(self, start_x , start_y) -> None:
-        exit_x, exit_y = self.get_exit()
+        exit_x, exit_y = self._exit
         directions = self.get_directions()
         queue = dq()
         visited = {(start_x, start_y)}
@@ -160,7 +139,7 @@ class MazeGenerator():
                 ny = y + dy
                 mid_x, mid_y = x + dx // 2, y + dy // 2
                 #print("nx , ny: ", nx ,ny)
-                if 0 <= nx < self.get_width() and 0 <= ny < self.get_height():
+                if 0 <= nx < self._width and 0 <= ny < self._height:
                     if (nx,ny) not in visited and self.maze[ny][nx] == 0 and self.maze[mid_y][mid_x] == 0:
                         visited.add((nx,ny))
                         #print("dx,dy :", dx, dy)
@@ -169,9 +148,9 @@ class MazeGenerator():
         return None
 
 def output(maze: MazeGenerator):
-    fichier: str = maze.get_o_file()
-    entry: tuple[int, int] = maze.get_entry()
-    exit: tuple[int, int] = maze.get_exit()
+    fichier: str = maze.o_file
+    entry: tuple[int, int] = maze._entry
+    exit: tuple[int, int] = maze._exit
     with open(fichier, "w") as f:
         f.write(maze.sol)
         f.write("\n")
