@@ -23,7 +23,9 @@ class Config(BaseModel):
     @classmethod
     def check_perfect(cls, data):
         perfect = data.get("is_perfect")
-        if not isinstance(perfect, str) or perfect.lower() not in ("true", "false"):
+        if not isinstance(perfect, str):
+            raise ValueError("PERFECT must be 'True' or 'False'")
+        if perfect.lower() not in ("true", "false"):
             raise ValueError("PERFECT must be 'True' or 'False'")
         data["is_perfect"] = perfect.lower() == "true"
         return data
@@ -70,7 +72,7 @@ def get_variable(name: str, default: Optional[str] = None) -> str:
         name of the environnement variable
 
     Returns:
-        value of the named environnement variable 
+        value of the named environnement variable
     """
     value = os.getenv(name, default)
     if value is None:
@@ -98,7 +100,7 @@ def create_conf() -> Config:
             entry = (int(entry[0]), int(entry[1])),
             exit = (int(exit[0]), int(exit[1])),
             o_file = get_variable("OUTPUT_FILE"),
-            is_perfect= get_variable("PERFECT").lower() == "true",
+            is_perfect=get_variable("PERFECT"),
             seed = int(get_variable("SEED"))
         )
     else :
@@ -108,7 +110,7 @@ def create_conf() -> Config:
             entry = (int(entry[0]), int(entry[1])),
             exit = (int(exit[0]), int(exit[1])),
             o_file = get_variable("OUTPUT_FILE"),
-            is_perfect= get_variable("PERFECT").lower() == "true"
+            is_perfect=get_variable("PERFECT")
         )
 
 
