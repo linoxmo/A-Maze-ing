@@ -40,6 +40,14 @@ def draw_line(img, x0, y0, x1, y1, color):
             err += dx
             y0 += sy
 
+def look_for_empty_line(tab: list[str]) -> int:
+    compt = 0
+    for k in tab:
+        if k == "":
+            return compt
+        compt +=1 
+    return compt
+
 class Maze():
     def __init__(self, mlx: Any, win: Any, img: Any, width: int, height: int) -> None:
         self.mlx: Any = mlx
@@ -62,10 +70,11 @@ class Maze():
     def load(self):
         lab = prep()
         tab_lab = lab.split("\n")
-        self.maze = tab_lab[0:15:1]
-        self.entry = tuple(int(d) for d in tab_lab[16].split(","))
-        self.exit = tuple(int(d) for d in tab_lab[17].split(","))
-        self.path = tab_lab[18]
+        line = look_for_empty_line(tab_lab)
+        self.maze = tab_lab[0:line:1]
+        self.entry = tuple(int(d) for d in tab_lab[line + 1].split(","))
+        self.exit = tuple(int(d) for d in tab_lab[line + 2].split(","))
+        self.path = tab_lab[line + 3]
 
     def render(self):
         ENTRY_COLOR = 0x00FF00
