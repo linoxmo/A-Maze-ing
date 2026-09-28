@@ -2,11 +2,12 @@ from parsing import create_conf,Config
 import random as rd
 from collections import deque as dq
 
+
 class MazeGenerator():
     def __init__(self) -> None:
         new_conf: Config = create_conf()
         self._width: int = new_conf.get_width() * 2
-        self._height: int = new_conf.get_height() * 2 
+        self._height: int = new_conf.get_height() * 2
         entry: tuple[ int, int]= new_conf.get_entry()
         exit: tuple[int, int] = new_conf.get_exit()
         self._entry: tuple[int, int] = (entry[0] * 2, entry[1] * 2)
@@ -24,9 +25,8 @@ class MazeGenerator():
 
     def init_maze(self) -> list[list[int]]:
         self.maze: list[list[int]] =  [[ 1 for _ in range(self._width)] for _ in range (self._height)]
-
         return self.maze
-    
+
     def dfs(self, x , y) -> None:
         w: int = self._width
         h: int = self._height
@@ -34,30 +34,28 @@ class MazeGenerator():
         directions = self.get_directions()
         rd.shuffle(directions)
         for dx, dy in directions :
-            nx: int = x + dx 
+            nx: int = x + dx
             ny: int = y +dy
             if 0 <= nx < w and 0 <= ny < h:
                 if self.maze[ny][nx] == 1:
                     #print(f"de ({x},{y}) vers ({nx},{ny}), mur creusé à ligne={y+dy//2} col={x+dx//2}")
-                    self.maze[y + dy // 2 ][x + dx // 2] = 0 
+                    self.maze[y + dy // 2 ][x + dx // 2] = 0
                     self.dfs(nx,ny)
 
     def build_pattern(self) -> list[str]:
         digit_4: list[str] = ["101", "101", "111", "001", "001"]
         digit_2: list[str] = ["111", "001", "111", "100", "111"]
-
         return [d4 + "0" + d2 for d4, d2 in zip(digit_4, digit_2)]
 
     def blocked_cells(self) -> set[tuple[int, int]]:
         pattern: list[str] = self.build_pattern()
-        p_h: int = len(pattern) 
+        p_h: int = len(pattern)
         p_w: int = len(pattern[0])
-        n_rows: float = (self._height + 1) // 2   
-        n_cols: float = (self._width + 1) // 2  
+        n_rows: float = (self._height + 1) // 2
+        n_cols: float = (self._width + 1) // 2
         start_row: float = (n_rows - p_h) // 2
-        start_col: float = (n_cols - p_w) // 2 
-        blocked: set  = set()
-
+        start_col: float = (n_cols - p_w) // 2
+        blocked: set = set()
         if n_rows < p_h or n_cols < p_w:
             return set()
         for r, row in enumerate(pattern):
@@ -68,10 +66,10 @@ class MazeGenerator():
 
     def apply_pattern_blocks(self) -> None:
         for (r, c) in self.blocked_cells():
-            row: int = r * 2 
-            col: int = c * 2  
-            self.maze[row][col] = 2   
-              
+            row: int = r * 2
+            col: int = c * 2
+            self.maze[row][col] = 2
+
     def create_maze(self, x , y) -> list[list[int]]:
         seed: int | None = self._seed
         if seed is not None:
@@ -92,16 +90,16 @@ class MazeGenerator():
     def convert_maze(self) -> None:
         hex_digits: str = "0123456789ABCDEF"
         self.sol: str = ""
-        for i in range(0, self._height, 2):      
+        for i in range(0, self._height, 2):
             for j in range(0, self._width, 2):
                 value = 0
-                if self.is_wall(i - 1, j): 
-                    value |= 1 
-                if self.is_wall(i, j + 1):  
+                if self.is_wall(i - 1, j):
+                    value |= 1
+                if self.is_wall(i, j + 1):
                     value |= 2
-                if self.is_wall(i + 1, j):   
+                if self.is_wall(i + 1, j):
                     value |= 4
-                if self.is_wall(i, j - 1): 
+                if self.is_wall(i, j - 1):
                     value |= 8
                 self.sol += hex_digits[value]
             self.sol += "\n"
@@ -127,13 +125,13 @@ class MazeGenerator():
         visited = {(start_x, start_y)}
         print("start",  start_x, start_y)
 
-        queue.append((start_x, start_y, ""))  
+        queue.append((start_x, start_y, ""))
         while queue:
             print(queue)
             x, y, path = queue.popleft()
             if x == exit_x and y == exit_y:
                 self.path = path
-                return 
+                return
             for dx, dy in directions:
                 nx = x + dx
                 ny = y + dy
@@ -146,6 +144,7 @@ class MazeGenerator():
                         letter: str = self.add_directions((dx, dy))
                         queue.append((nx, ny, path + letter ))
         return None
+
 
 def output(maze: MazeGenerator):
     fichier: str = maze.o_file
