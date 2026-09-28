@@ -4,7 +4,16 @@ from parsing import get_variable
 import os
 from typing import Any
 
+
 def prep() -> str:
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     load_dotenv()
     fichier = get_variable("OUTPUT_FILE")
     with open(fichier, "r") as file:
@@ -14,6 +23,14 @@ def prep() -> str:
         return (lab)
 
 def cell_walls(hex_char: str) -> dict[str,bool]:
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     v = int(hex_char, 16)
     return {
         'N': bool(v & 0b0001),
@@ -23,6 +40,14 @@ def cell_walls(hex_char: str) -> dict[str,bool]:
     }
 
 def draw_line(img, x0, y0, x1, y1, color):
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     dx = abs(x1 - x0)
     dy = -abs(y1 - y0)
     sx = 1 if x0 < x1 else -1
@@ -41,15 +66,31 @@ def draw_line(img, x0, y0, x1, y1, color):
             y0 += sy
 
 def look_for_empty_line(tab: list[str]) -> int:
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     compt = 0
     for k in tab:
         if k == "":
             return compt
-        compt +=1 
+        compt +=1
     return compt
 
 class Maze():
     def __init__(self, mlx: Any, win: Any, img: Any, width: int, height: int) -> None:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         self.mlx: Any = mlx
         self.win: Any = win
         self.img: Any = img
@@ -68,6 +109,14 @@ class Maze():
         self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
 
     def load(self):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         lab = prep()
         tab_lab = lab.split("\n")
         line = look_for_empty_line(tab_lab)
@@ -77,6 +126,14 @@ class Maze():
         self.path = tab_lab[line + 3]
 
     def render(self):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         ENTRY_COLOR = 0x00FF00
         EXIT_COLOR = 0xFF0000
         self.img = self.mlx.new_image(self.width, self.height)
@@ -90,16 +147,40 @@ class Maze():
         self._draw_button(self.toggle_btn, 0x0000FF)
 
     def _draw_button(self, btn, color):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         for dy in range(btn["h"]):
             for dx in range(btn["w"]):
                 self.img.pixel_put(btn["x"] + dx, btn["y"] + dy, color)
 
     def redraw(self):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         self.win.put_image(self.img)
         self.win.string_put(self.close_btn["x"] + 15, self.close_btn["y"] + 20, 0x00FF00, "Fermer")
         self.win.string_put(self.toggle_btn["x"] + 5, self.toggle_btn["y"] + 20, 0xFFFFFF, "Chemin")
 
-    def on_mouse_click(self, btn, x, y):
+    def on_mouse_click(self, x, y):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         if self._is_in(x, y, self.close_btn):
             self.mlx.loop_end()
         elif self._is_in(x, y, self.toggle_btn):
@@ -107,6 +188,14 @@ class Maze():
             self.render()
 
     def draw_maze(self):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         WALL_COLOR = 0xFFFFFF
         for y, row in enumerate(self.maze):
             for x, ch in enumerate(row):
@@ -118,6 +207,14 @@ class Maze():
                 if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, WALL_COLOR)
 
     def draw_closed_cells(self, color=0x808080):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         for y, row in enumerate(self.maze):
             for x, ch in enumerate(row):
                 w = cell_walls(ch)
@@ -125,6 +222,14 @@ class Maze():
                     self.fill_cell(x, y, color, margin=2)
 
     def draw_path(self):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         MOVES = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'W': (-1, 0)}
         PATH_COLOR = 0xFF0000
         x, y = self.entry
@@ -136,6 +241,14 @@ class Maze():
             draw_line(self.img, cx1, cy1, cx2, cy2, PATH_COLOR)
 
     def fill_cell(self, x, y, color, margin=2):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
         for dy in range(margin, self.tile - margin):
             for dx in range(margin, self.tile - margin):
@@ -143,9 +256,25 @@ class Maze():
 
     @staticmethod
     def _is_in(x, y, btn):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         return btn["x"] <= x <= btn["x"] + btn["w"] and btn["y"] <= y <= btn["y"] + btn["h"]
 
 def mlx_rendering() -> None:
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     mlx = Mlx()
     WIDTH = 1000
     HEIGHT = 1000

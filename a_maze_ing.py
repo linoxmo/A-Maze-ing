@@ -1,4 +1,12 @@
-def new_import() -> list: 
+def new_import() -> list:
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     import sys
     from maze_creation import MazeGenerator as mg
     from maze_creation import output
@@ -8,7 +16,15 @@ def new_import() -> list:
     return tab_import
 
 
-def main() -> None:
+if __name__ == "__main__":
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     try:
         tab = new_import()
         sys = tab[0]
@@ -30,6 +46,3 @@ def main() -> None:
     except Exception as e:
         print(e)
     return
-
-if __name__ == "__main__":
-    main()

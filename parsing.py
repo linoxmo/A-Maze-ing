@@ -1,6 +1,5 @@
 from termios import VQUIT
 from unittest.loader import VALID_MODULE_NAME
-
 from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
 from typing import Optional
@@ -22,6 +21,14 @@ class Config(BaseModel):
     @model_validator(mode = "before")
     @classmethod
     def check_perfect(cls, data):
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         perfect = data.get("is_perfect")
         if not isinstance(perfect, str):
             raise ValueError("PERFECT must be 'True' or 'False'")
@@ -32,6 +39,14 @@ class Config(BaseModel):
 
     @model_validator(mode = "after")
     def check_coordinates(self) -> "Config":
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         for name, (x, y) in (("entry", self.entry), ("exit", self.exit)):
             if not (0 <= x < self.width and 0 <= y < self.height):
                 raise ValueError(f"{name} {(x, y)} is outside the maze")
@@ -39,30 +54,30 @@ class Config(BaseModel):
             raise ValueError("entry and exit must be different")
         return self
 
-    def show_config(self) -> None:
-        for value in self.model_dump().values():
-            print(value)
+    # def show_config(self) -> None:
+    #     for value in self.model_dump().values():
+    #         print(value)
 
-    def get_width(self) -> int:
-        return self.width
+    # def get_width(self) -> int:
+    #     return self.width
 
-    def get_height(self) -> int:
-        return self.height
+    # def get_height(self) -> int:
+    #     return self.height
 
-    def get_entry(self) -> tuple[int,int]:
-        return self.entry
+    # def get_entry(self) -> tuple[int,int]:
+    #     return self.entry
 
-    def get_exit(self) -> tuple[int, int]:
-        return self.exit
+    # def get_exit(self) -> tuple[int, int]:
+    #     return self.exit
 
-    def get_o_file(self) -> str:
-        return self.o_file
+    # def get_o_file(self) -> str:
+    #     return self.o_file
 
-    def get_is_perfect(self) -> bool:
-        return self.is_perfect
+    # def get_is_perfect(self) -> bool:
+    #     return self.is_perfect
 
-    def get_seed(self) -> Optional[int]:
-        return self.seed
+    # def get_seed(self) -> Optional[int]:
+    #     return self.seed
 
 
 def get_variable(name: str, default: Optional[str] = None) -> str:

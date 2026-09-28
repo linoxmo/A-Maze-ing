@@ -5,6 +5,14 @@ from collections import deque as dq
 
 class MazeGenerator():
     def __init__(self) -> None:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         new_conf: Config = create_conf()
         self._width: int = new_conf.get_width() * 2
         self._height: int = new_conf.get_height() * 2
@@ -21,13 +29,37 @@ class MazeGenerator():
         self.path: str = ""
 
     def get_directions(self) -> list[tuple[int,int]]:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         return list(self._directions)
 
     def init_maze(self) -> list[list[int]]:
-        self.maze: list[list[int]] =  [[ 1 for _ in range(self._width)] for _ in range (self._height)]
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
+        self.maze: list[list[int]] = [[ 1 for _ in range(self._width)] for _ in range (self._height)]
         return self.maze
 
     def dfs(self, x , y) -> None:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         w: int = self._width
         h: int = self._height
         self.maze[y][x] = 0
@@ -43,11 +75,27 @@ class MazeGenerator():
                     self.dfs(nx,ny)
 
     def build_pattern(self) -> list[str]:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         digit_4: list[str] = ["101", "101", "111", "001", "001"]
         digit_2: list[str] = ["111", "001", "111", "100", "111"]
         return [d4 + "0" + d2 for d4, d2 in zip(digit_4, digit_2)]
 
     def blocked_cells(self) -> set[tuple[int, int]]:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         pattern: list[str] = self.build_pattern()
         p_h: int = len(pattern)
         p_w: int = len(pattern[0])
@@ -65,12 +113,28 @@ class MazeGenerator():
         return blocked
 
     def apply_pattern_blocks(self) -> None:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         for (r, c) in self.blocked_cells():
             row: int = r * 2
             col: int = c * 2
             self.maze[row][col] = 2
 
     def create_maze(self, x , y) -> list[list[int]]:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         seed: int | None = self._seed
         if seed is not None:
             print(seed)
@@ -83,11 +147,27 @@ class MazeGenerator():
         return self.maze
 
     def is_wall(self, i, j) -> bool:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         if i < 0 or i >= self._height or j < 0 or j >= self._width:
             return True
         return self.maze[i][j] == 1
 
     def convert_maze(self) -> None:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         hex_digits: str = "0123456789ABCDEF"
         self.sol: str = ""
         for i in range(0, self._height, 2):
@@ -105,6 +185,14 @@ class MazeGenerator():
             self.sol += "\n"
 
     def add_directions(self, vector: tuple[int,int]) -> str:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         directions = self.get_directions()
         print(directions[0])
         if vector == directions[0]:
@@ -119,6 +207,14 @@ class MazeGenerator():
              return("None")
 
     def bfs(self, start_x , start_y) -> None:
+        """ Function to xxx
+
+        Args:
+            None
+
+        Returns:
+            xxx
+        """
         exit_x, exit_y = self._exit
         directions = self.get_directions()
         queue = dq()
@@ -147,6 +243,14 @@ class MazeGenerator():
 
 
 def output(maze: MazeGenerator):
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     fichier: str = maze.o_file
     entry: tuple[int, int] = maze._entry
     exit: tuple[int, int] = maze._exit
@@ -161,6 +265,14 @@ def output(maze: MazeGenerator):
 
 
 if __name__ == '__main__':
+    """ Function to xxx
+
+    Args:
+        None
+
+    Returns:
+        xxx
+    """
     maze = MazeGenerator()
     grille = maze.create_maze(0,0)
     #for ligne in grille:
