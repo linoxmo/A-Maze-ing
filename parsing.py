@@ -1,3 +1,6 @@
+from termios import VQUIT
+from unittest.loader import VALID_MODULE_NAME
+
 from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
 from typing import Optional
@@ -15,6 +18,15 @@ class Config(BaseModel):
     o_file: str
     is_perfect: bool
     seed:Optional[int] = Field(default = None , ge = 0)
+
+    @model_validator(mode = "before")
+    @classmethod
+    def check_perfect(cls, data):
+        perfect = data.get("is_perfect")
+        if not isinstance(perfect, str) or perfect.lower() not in ("true", "false"):
+            raise ValueError("PERFECT must be 'True' or 'False'")
+        data["is_perfect"] = perfect.lower() == "true"
+        return data
 
     @model_validator(mode = "after")
     def check_coordinates(self) -> "Config":
@@ -50,6 +62,7 @@ class Config(BaseModel):
     def get_seed(self) -> Optional[int]:
         return self.seed
 
+
 def get_variable(name: str, default: Optional[str] = None) -> str:
     value = os.getenv(name, default)
     if value is None:
@@ -74,10 +87,15 @@ def create_conf() -> Config:
         )
     else :
         return Config(
-                    width = int(get_variable("WIDTH")),
-                    height = int(get_variable("HEIGHT")),
-                    entry = (int(entry[0]), int(entry[1])),
-                    exit = (int(exit[0]), int(exit[1])),
-                    o_file = get_variable("OUTPUT_FILE"),
-                    is_perfect= get_variable("PERFECT").lower() == "true"
-                )
+            width = int(get_variable("WIDTH")),
+            height = int(get_variable("HEIGHT")),
+            entry = (int(entry[0]), int(entry[1])),
+            exit = (int(exit[0]), int(exit[1])),
+            o_file = get_variable("OUTPUT_FILE"),
+            is_perfect= get_variable("PERFECT").lower() == "true"
+        )
+
+
+# Creer le venv et pip install all puis pour installer le Mlx :
+# python3 -m pip install minilibx-python
+# python3 a_maze_ing.py .env
