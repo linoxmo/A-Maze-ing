@@ -12,7 +12,7 @@ $(VENV):
 	$(PYTHON) -m venv $(VENV)
 
 install: $(VENV)
-	$(PIP) install -r reauirements.txt
+	$(PIP) install -r requirements.txt
 
 run: install
 	$(PY) $(NAME) $(CONFIG)

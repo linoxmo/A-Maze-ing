@@ -14,15 +14,15 @@ class MazeGenerator():
             xxx
         """
         new_conf: Config = create_conf()
-        self._width: int = new_conf.get_width() * 2
-        self._height: int = new_conf.get_height() * 2
-        entry: tuple[ int, int]= new_conf.get_entry()
-        exit: tuple[int, int] = new_conf.get_exit()
+        self._width: int = new_conf.width * 2
+        self._height: int = new_conf.height * 2
+        entry: tuple[ int, int]= new_conf.entry
+        exit: tuple[int, int] = new_conf.exit
         self._entry: tuple[int, int] = (entry[0] * 2, entry[1] * 2)
         self._exit: tuple[int, int] = (exit[0] * 2, exit[1] * 2)
-        self._isperfect: bool = new_conf.get_is_perfect()
-        self._seed: int | None = new_conf.get_seed()
-        self.o_file: str = new_conf.get_o_file()
+        self._isperfect: bool = new_conf.is_perfect
+        self._seed: int | None = new_conf.seed
+        self.o_file: str = new_conf.o_file
         self._directions: list[tuple[int,int]] = [(0, -2), (0, 2), (-2, 0), (2, 0)]
         self.maze : list[list[int]]
         self.sol : str = ""

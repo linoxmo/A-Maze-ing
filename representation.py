@@ -172,7 +172,7 @@ class Maze():
         self.win.string_put(self.close_btn["x"] + 15, self.close_btn["y"] + 20, 0x00FF00, "Fermer")
         self.win.string_put(self.toggle_btn["x"] + 5, self.toggle_btn["y"] + 20, 0xFFFFFF, "Chemin")
 
-    def on_mouse_click(self, x, y):
+    def on_mouse_click(self, btn, x, y):
         """ Function to xxx
 
         Args:

@@ -54,31 +54,6 @@ class Config(BaseModel):
             raise ValueError("entry and exit must be different")
         return self
 
-    # def show_config(self) -> None:
-    #     for value in self.model_dump().values():
-    #         print(value)
-
-    # def get_width(self) -> int:
-    #     return self.width
-
-    # def get_height(self) -> int:
-    #     return self.height
-
-    # def get_entry(self) -> tuple[int,int]:
-    #     return self.entry
-
-    # def get_exit(self) -> tuple[int, int]:
-    #     return self.exit
-
-    # def get_o_file(self) -> str:
-    #     return self.o_file
-
-    # def get_is_perfect(self) -> bool:
-    #     return self.is_perfect
-
-    # def get_seed(self) -> Optional[int]:
-    #     return self.seed
-
 
 def get_variable(name: str, default: Optional[str] = None) -> str:
     """ Function to get the value of the .env environnment variables
