@@ -142,6 +142,8 @@ class MazeGenerator():
         self.init_maze()
         self.apply_pattern_blocks()
         self.dfs(x, y)
+        if not self._isperfect:
+            self.remove_dead_ends()
         en_x, en_y = self._entry
         self.bfs(en_x, en_y)
         return self.maze
@@ -241,6 +243,35 @@ class MazeGenerator():
                         queue.append((nx, ny, path + letter ))
         return None
 
+    def remove_dead_ends(self) -> None:
+        """ Function to xxx
+        
+            Args:
+                None
+        
+            Returns:
+                xxx
+            """
+        for y in range(0, self._height, 2):
+            for x in range(0, self._width, 2):
+                if self.maze[y][x] == 2:  
+                    continue
+
+                open_count = 0
+                closable = []
+                for dx, dy in self.get_directions():
+                    nx, ny = x + dx, y + dy
+                    if not (0 <= nx < self._width and 0 <= ny < self._height):
+                        continue
+                    mx, my = x + dx // 2, y + dy // 2
+                    if self.maze[my][mx] == 0:
+                        open_count += 1
+                    elif self.maze[ny][nx] == 0:
+                        closable.append((mx, my))
+
+                if open_count == 1 and closable:
+                    mx, my = rd.choice(closable)
+                    self.maze[my][mx] = 0
 
 def output(maze: MazeGenerator):
     """ Function to xxx
@@ -262,35 +293,3 @@ def output(maze: MazeGenerator):
         f.write(f"{exit[0] // 2}, {exit[1] // 2} ")
         f.write("\n")
         f.write(maze.path)
-
-def verify(tab: list[list[int]], pos: tuple[int]) -> bool:
-    lst = [-1,0,1]
-    for i in lst:
-        for j in lst:
-            if tab[pos[0] + i][pos[1] + j] == 1:
-                return True
-    return False
-
-def non_perfect(self) -> None:
-     new_maze = list(self.maze)
-     walls, i= rd.randint(3,5), 0
-     while i <= walls:
-        y = rd.randrange(len(new_maze))
-        x = rd.randrange(len(new_maze[0]))
-        value = new_maze[y][x]
-        if value == 1 and verify(self.maze, (x,y)):
-             self.maze[y][x] == 1
-             i += 1
-        
-        return 
-
-if __name__ == '__main__':
-    maze = MazeGenerator()
-    grille = maze.create_maze(0,0)
-    #for ligne in grille:
-    #    texte = "".join(["#" if c == 1 else ("P" if c == "P" else " ") for c in ligne])
-    #    print(texte)
-    maze.convert_maze()
-    #print(maze.sol)
-    #print(maze.path)
-    output(maze)

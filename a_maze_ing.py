@@ -36,10 +36,6 @@ def main() -> None:
             return
         maze = mg()
         grille = maze.create_maze(0,0)
-        print(grille[1][1], grille[1][0], grille[0][1])
-        for ligne in grille:
-            texte = "".join(["#" if c == 1 else ("P" if c == "P" else " ") for c in ligne])
-            print(texte)
         maze.convert_maze()
         output(maze)
         mlxr()
