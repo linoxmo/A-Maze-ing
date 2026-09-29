@@ -83,7 +83,7 @@ class MazeGenerator():
         Returns:
             xxx
         """
-        digit_4: list[str] = ["101", "101", "111", "001", "001"]
+        digit_4: list[str] = ["100", "100", "111", "001", "001"]
         digit_2: list[str] = ["111", "001", "111", "100", "111"]
         return [d4 + "0" + d2 for d4, d2 in zip(digit_4, digit_2)]
 
@@ -263,16 +263,28 @@ def output(maze: MazeGenerator):
         f.write("\n")
         f.write(maze.path)
 
+def verify(tab: list[list[int]], pos: tuple[int]) -> bool:
+    lst = [-1,0,1]
+    for i in lst:
+        for j in lst:
+            if tab[pos[0] + i][pos[1] + j] == 1:
+                return True
+    return False
+
+def non_perfect(self) -> None:
+     new_maze = list(self.maze)
+     walls, i= rd.randint(3,5), 0
+     while i <= walls:
+        y = rd.randrange(len(new_maze))
+        x = rd.randrange(len(new_maze[0]))
+        value = new_maze[y][x]
+        if value == 1 and verify(self.maze, (x,y)):
+             self.maze[y][x] == 1
+             i += 1
+        
+        return 
 
 if __name__ == '__main__':
-    """ Function to xxx
-
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     maze = MazeGenerator()
     grille = maze.create_maze(0,0)
     #for ligne in grille:

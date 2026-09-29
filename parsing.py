@@ -1,5 +1,3 @@
-from termios import VQUIT
-from unittest.loader import VALID_MODULE_NAME
 from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
 from typing import Optional
@@ -102,6 +100,3 @@ def create_conf() -> Config:
             o_file = get_variable("OUTPUT_FILE"),
             is_perfect=get_variable("PERFECT")
         )
-
-
-# python3 a_maze_ing.py .env
