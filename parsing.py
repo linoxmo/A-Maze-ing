@@ -10,6 +10,10 @@ load_dotenv()
 
 
 class Config(BaseModel):
+    """Represent and validate the maze configuration.
+    Args: width, height, entry, exit, o_file, is_perfect, optional seed are the maze configuration values.
+    Returns: none."""
+
     width: int = Field(ge=2, le=50)
     height: int = Field(ge=2, le=50)
     entry:tuple[int, int]
@@ -21,14 +25,10 @@ class Config(BaseModel):
     @model_validator(mode = "before")
     @classmethod
     def check_perfect(cls, data):
-        """ Function to xxx
+        """Validate and convert the PERFECT configuration value to a boolean.
+        Args: data contains the configuration values to validate.
+        Returns: the configuration data with PERFECT converted to a boolean. """
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         perfect = data.get("is_perfect")
         if not isinstance(perfect, str):
             raise ValueError("PERFECT must be 'True' or 'False'")
@@ -39,14 +39,10 @@ class Config(BaseModel):
 
     @model_validator(mode = "after")
     def check_coordinates(self) -> "Config":
-        """ Function to xxx
+        """Validate the entry and exit coordinates of the maze.
+        Args: none.
+        Returns: the validated configuration. """
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         for name, (x, y) in (("entry", self.entry), ("exit", self.exit)):
             if not (0 <= x < self.width and 0 <= y < self.height):
                 raise ValueError(f"{name} {(x, y)} is outside the maze")
@@ -54,41 +50,12 @@ class Config(BaseModel):
             raise ValueError("entry and exit must be different")
         return self
 
-    # def show_config(self) -> None:
-    #     for value in self.model_dump().values():
-    #         print(value)
-
-    # def get_width(self) -> int:
-    #     return self.width
-
-    # def get_height(self) -> int:
-    #     return self.height
-
-    # def get_entry(self) -> tuple[int,int]:
-    #     return self.entry
-
-    # def get_exit(self) -> tuple[int, int]:
-    #     return self.exit
-
-    # def get_o_file(self) -> str:
-    #     return self.o_file
-
-    # def get_is_perfect(self) -> bool:
-    #     return self.is_perfect
-
-    # def get_seed(self) -> Optional[int]:
-    #     return self.seed
-
 
 def get_variable(name: str, default: Optional[str] = None) -> str:
-    """ Function to get the value of the .env environnment variables
+    """Get an environment variable by its name.
+    Args: name is the variable to get and default is its optional default value.
+    Returns: the variable value, its default value or "Missing" if neither exists."""
 
-    Args:
-        name of the environnement variable
-
-    Returns:
-        value of the named environnement variable
-    """
     value = os.getenv(name, default)
     if value is None:
         return "Missing"
@@ -96,14 +63,10 @@ def get_variable(name: str, default: Optional[str] = None) -> str:
 
 
 def create_conf() -> Config:
-    """ Function to iniate a Config with the environnment variables
+    """Create the maze configuration based on the environment variables.
+    Args: none.
+    Returns: the validated maze configuration."""
 
-    Args:
-        None
-
-    Returns:
-        Config object
-    """
     entry = get_variable("ENTRY").split(",")
     exit = get_variable("EXIT").split(",")
     seed = get_variable("SEED")
@@ -127,6 +90,3 @@ def create_conf() -> Config:
             o_file = get_variable("OUTPUT_FILE"),
             is_perfect=get_variable("PERFECT")
         )
-
-
-# python3 a_maze_ing.py .env

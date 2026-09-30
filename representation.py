@@ -6,14 +6,10 @@ from typing import Any
 
 
 def prep() -> str:
-    """ Function to xxx
+    """Read the maze data from the configured output file.
+    Args: none.
+    Returns: the content of the output file as a string."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     load_dotenv()
     fichier = get_variable("OUTPUT_FILE")
     with open(fichier, "r") as file:
@@ -23,14 +19,10 @@ def prep() -> str:
         return (lab)
 
 def cell_walls(hex_char: str) -> dict[str,bool]:
-    """ Function to xxx
+    """Decode a hexadecimal character to determine the cell walls.
+    Args: hex_char is the hexadecimal representation of a maze cell.
+    Returns: the presence or absence of the N, W, S and E walls."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     v = int(hex_char, 16)
     return {
         'N': bool(v & 0b0001),
@@ -40,14 +32,10 @@ def cell_walls(hex_char: str) -> dict[str,bool]:
     }
 
 def draw_line(img, x0, y0, x1, y1, color):
-    """ Function to xxx
+    """Draw a line between two points on an image.
+    Args: img is the image to draw on, x0 and y0 are the starting coordinates, x1 and y1 are the ending coordinates, color is the line color.
+    Returns: none."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     dx = abs(x1 - x0)
     dy = -abs(y1 - y0)
     sx = 1 if x0 < x1 else -1
@@ -66,14 +54,10 @@ def draw_line(img, x0, y0, x1, y1, color):
             y0 += sy
 
 def look_for_empty_line(tab: list[str]) -> int:
-    """ Function to xxx
+    """Find the first empty line in a list of strings.
+    Args: tab is the list of strings to search.
+    Returns: the index of the first empty line (or the list length if none is found)."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     compt = 0
     for k in tab:
         if k == "":
@@ -82,15 +66,15 @@ def look_for_empty_line(tab: list[str]) -> int:
     return compt
 
 class Maze():
+    """Represent and graphically display a maze.
+    Args: none.
+    Returns: none."""
+
     def __init__(self, mlx: Any, win: Any, img: Any, width: int, height: int) -> None:
-        """ Function to xxx
+        """Initialize the maze graphical representation.
+        Args: mlx, win, and img are the graphical objects, width and height are the window dimensions.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         self.mlx: Any = mlx
         self.win: Any = win
         self.img: Any = img
@@ -109,14 +93,10 @@ class Maze():
         self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
 
     def load(self):
-        """ Function to xxx
+        """Load the maze, entry, exit and solution path from the output file (after function output).
+        Args: none.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         lab = prep()
         tab_lab = lab.split("\n")
         line = look_for_empty_line(tab_lab)
@@ -126,14 +106,10 @@ class Maze():
         self.path = tab_lab[line + 3]
 
     def render(self):
-        """ Function to xxx
+        """Render the maze and its graphical elements on the image.
+        Args: none.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         ENTRY_COLOR = 0x00FF00
         EXIT_COLOR = 0xFF0000
         self.img = self.mlx.new_image(self.width, self.height)
@@ -147,55 +123,48 @@ class Maze():
         self._draw_button(self.toggle_btn, 0x0000FF)
 
     def _draw_button(self, btn, color):
-        """ Function to xxx
+        """Draw a rectangular button on the image.
+        Args: btn contains the button position and dimensions, color is the color of the button.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         for dy in range(btn["h"]):
             for dx in range(btn["w"]):
                 self.img.pixel_put(btn["x"] + dx, btn["y"] + dy, color)
 
     def redraw(self):
-        """ Function to xxx
+        """Display the current image and buttons and add the buttons' name on it.
+        Args: none.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         self.win.put_image(self.img)
         self.win.string_put(self.close_btn["x"] + 15, self.close_btn["y"] + 20, 0x00FF00, "Fermer")
         self.win.string_put(self.toggle_btn["x"] + 5, self.toggle_btn["y"] + 20, 0xFFFFFF, "Chemin")
 
     def on_mouse_click(self, x, y):
-        """ Function to xxx
+        """Detect if a mouse click is on the close or path toggle buttons.
+        Args: x and y are the coordinates of the mouse click.
+        Returns: none."""
+# La fonction n'activate pas the button if needed, tu confirmes ?
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         if self._is_in(x, y, self.close_btn):
             self.mlx.loop_end()
         elif self._is_in(x, y, self.toggle_btn):
             self.show_path = not self.show_path
             self.render()
 
+    @staticmethod
+    def _is_in(x, y, btn):
+        """Check whether a point (x, y) is inside a button.
+        Args: x and y are the point coordinates, btn contains the button position and dimensions.
+        Returns: boolean true if the point is inside the button, otherwise false."""
+
+        return btn["x"] <= x <= btn["x"] + btn["w"] and btn["y"] <= y <= btn["y"] + btn["h"]
+
     def draw_maze(self):
-        """ Function to xxx
+        """Draw the walls of every maze cell on the image.
+        Args: none.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         WALL_COLOR = 0xFFFFFF
         for y, row in enumerate(self.maze):
             for x, ch in enumerate(row):
@@ -207,29 +176,31 @@ class Maze():
                 if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, WALL_COLOR)
 
     def draw_closed_cells(self, color=0x808080):
-        """ Function to xxx
+        """Fill all maze cells that are closed on all four edges.
+        Args: color is the color used to fill the closed cells.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         for y, row in enumerate(self.maze):
             for x, ch in enumerate(row):
                 w = cell_walls(ch)
                 if all(w.values()):
                     self.fill_cell(x, y, color, margin=2)
 
+    def fill_cell(self, x, y, color, margin=2):
+        """Fill one maze cell with a color while preserving a margin around its edges.
+        Args: x and y are the cell coordinates, color is the fill color, margin is the space left around its edges (2 by default).
+        Returns: none."""
+
+        px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
+        for dy in range(margin, self.tile - margin):
+            for dx in range(margin, self.tile - margin):
+                self.img.pixel_put(px + dx, py + dy, color)
+
     def draw_path(self):
-        """ Function to xxx
+        """Draw the solution path from the maze entry to the exit.
+        Args: none.
+        Returns: none."""
 
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
         MOVES = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'W': (-1, 0)}
         PATH_COLOR = 0xFF0000
         x, y = self.entry
@@ -240,41 +211,12 @@ class Maze():
             cx2, cy2 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
             draw_line(self.img, cx1, cy1, cx2, cy2, PATH_COLOR)
 
-    def fill_cell(self, x, y, color, margin=2):
-        """ Function to xxx
-
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
-        px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
-        for dy in range(margin, self.tile - margin):
-            for dx in range(margin, self.tile - margin):
-                self.img.pixel_put(px + dx, py + dy, color)
-
-    @staticmethod
-    def _is_in(x, y, btn):
-        """ Function to xxx
-
-        Args:
-            None
-
-        Returns:
-            xxx
-        """
-        return btn["x"] <= x <= btn["x"] + btn["w"] and btn["y"] <= y <= btn["y"] + btn["h"]
 
 def mlx_rendering() -> None:
-    """ Function to xxx
+    """Initialize the graphical window and start the maze display loop.
+    Args: none.
+    Returns: none."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     mlx = Mlx()
     WIDTH = 1000
     HEIGHT = 1000

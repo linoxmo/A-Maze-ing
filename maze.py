@@ -4,6 +4,10 @@ from collections import deque as dq
 
 
 class MazeGenerator():
+    """Generate a maze and find its solution from the configured parameters.
+    Args: none.
+    Returns: none."""
+
     def __init__(self) -> None:
         """Initialize the maze generator with the configuration parameters.
         Args: none.
@@ -212,15 +216,15 @@ def output(maze: MazeGenerator) -> None:
         f.write(maze.path)
 
 
-if __name__ == '__main__':
-    """A supprimer c'est ca ?"""
+# if __name__ == '__main__':
+#     """A supprimer c'est ca ?"""
 
-    maze = MazeGenerator()
-    grille = maze.create_maze(0,0)
-    #for ligne in grille:
-    #    texte = "".join(["#" if c == 1 else ("P" if c == "P" else " ") for c in ligne])
-    #    print(texte)
-    maze.convert_maze()
-    #print(maze.sol)
-    #print(maze.path)
-    output(maze)
+#     maze = MazeGenerator()
+#     grille = maze.create_maze(0,0)
+#     #for ligne in grille:
+#     #    texte = "".join(["#" if c == 1 else ("P" if c == "P" else " ") for c in ligne])
+#     #    print(texte)
+#     maze.convert_maze()
+#     #print(maze.sol)
+#     #print(maze.path)
+#     output(maze)
