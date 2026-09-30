@@ -70,7 +70,6 @@ class MazeGenerator():
             ny: int = y +dy
             if 0 <= nx < w and 0 <= ny < h:
                 if self.maze[ny][nx] == 1:
-                    #print(f"de ({x},{y}) vers ({nx},{ny}), mur creusé à ligne={y+dy//2} col={x+dx//2}")
                     self.maze[y + dy // 2 ][x + dx // 2] = 0
                     self.dfs(nx,ny)
 
@@ -137,7 +136,6 @@ class MazeGenerator():
         """
         seed: int | None = self._seed
         if seed is not None:
-            print(seed)
             rd.seed(seed)
         self.init_maze()
         self.apply_pattern_blocks()
@@ -196,7 +194,6 @@ class MazeGenerator():
             xxx
         """
         directions = self.get_directions()
-        print(directions[0])
         if vector == directions[0]:
             return("N")
         elif vector == directions[1]:
@@ -221,11 +218,9 @@ class MazeGenerator():
         directions = self.get_directions()
         queue = dq()
         visited = {(start_x, start_y)}
-        print("start",  start_x, start_y)
 
         queue.append((start_x, start_y, ""))
         while queue:
-            print(queue)
             x, y, path = queue.popleft()
             if x == exit_x and y == exit_y:
                 self.path = path
@@ -234,11 +229,9 @@ class MazeGenerator():
                 nx = x + dx
                 ny = y + dy
                 mid_x, mid_y = x + dx // 2, y + dy // 2
-                #print("nx , ny: ", nx ,ny)
                 if 0 <= nx < self._width and 0 <= ny < self._height:
                     if (nx,ny) not in visited and self.maze[ny][nx] == 0 and self.maze[mid_y][mid_x] == 0:
                         visited.add((nx,ny))
-                        #print("dx,dy :", dx, dy)
                         letter: str = self.add_directions((dx, dy))
                         queue.append((nx, ny, path + letter ))
         return None
