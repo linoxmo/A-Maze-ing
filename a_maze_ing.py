@@ -15,7 +15,6 @@ def new_import() -> list:
     tab_import = [sys, mg, mlxr, output]
     return tab_import
 
-
 def main() -> None:
     """ Function to xxx
 
@@ -32,7 +31,7 @@ def main() -> None:
         mlxr = tab[2]
         output = tab[3]
         if len(sys.argv) != 2:
-            print("Error: input should be \' python3 a_maze_ing.py config.txt \'")
+            print("Error: input should be \' python3 a_maze_ing.py .env\'")
             return
         maze = mg()
         grille = maze.create_maze(0,0)
@@ -41,7 +40,6 @@ def main() -> None:
         mlxr()
     except Exception as e:
         print(e)
-
 
 if __name__ == "__main__":
     main()

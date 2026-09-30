@@ -81,6 +81,18 @@ def look_for_empty_line(tab: list[str]) -> int:
         compt +=1
     return compt
 
+def parse_color(value: str, default: int) -> int:
+    """Convertit une chaîne "0xRRGGBB" ou "#RRGGBB" en entier, ou renvoie default."""
+    if not value:
+        return default
+    value = value.strip().lstrip("#")
+    if value.lower().startswith("0x"):
+        value = value[2:]
+    try:
+        return int(value, 16)
+    except ValueError:
+        return default
+    
 class Maze():
     def __init__(self, mlx: Any, win: Any, img: Any, width: int, height: int) -> None:
         """ Function to xxx
@@ -104,6 +116,11 @@ class Maze():
         self.offset_X: int = 50
         self.offset_Y: int = 100
         self.tile: int = 32
+        self.wall_color: int = parse_color(get_variable("WALL_COLOR"), 0xFFFFFF)
+        self.pattern_color: int = parse_color(get_variable("PATTERN_COLOR"), 0x808080)
+        self.entry_color: int = parse_color(get_variable("ENTRY_COLOR"), 0x00FF00)
+        self.exit_color: int = parse_color(get_variable("EXIT_COLOR"), 0xFF0000)
+        self.path_color: int = parse_color(get_variable("PATH_COLOR"), 0xFF0000)
 
         self.close_btn: dict[str,int] = {"x": 900, "y": 10, "w": 80, "h": 30}
         self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
@@ -134,17 +151,23 @@ class Maze():
         Returns:
             xxx
         """
-        ENTRY_COLOR = 0x00FF00
-        EXIT_COLOR = 0xFF0000
         self.img = self.mlx.new_image(self.width, self.height)
         self.draw_maze()
-        self.draw_closed_cells()
-        self.fill_cell(self.entry[0], self.entry[1], ENTRY_COLOR)
-        self.fill_cell(self.exit[0], self.exit[1], EXIT_COLOR)
+        self.draw_pattern_cells()
+        self.fill_cell(self.entry[0], self.entry[1], self.entry_color)
+        self.fill_cell(self.exit[0], self.exit[1], self.exit_color)
         if self.show_path:
             self.draw_path()
         self._draw_button(self.close_btn, 0xFFFFFF)
         self._draw_button(self.toggle_btn, 0x0000FF)
+        
+    def draw_pattern_cells(self):
+        """Colore les cellules totalement murées (motif "42")."""
+        for y, row in enumerate(self.maze):
+            for x, ch in enumerate(row):
+                w = cell_walls(ch)
+                if all(w.values()):
+                    self.fill_cell(x, y, self.pattern_color)
 
     def _draw_button(self, btn, color):
         """ Function to xxx
@@ -196,15 +219,14 @@ class Maze():
         Returns:
             xxx
         """
-        WALL_COLOR = 0xFFFFFF
         for y, row in enumerate(self.maze):
             for x, ch in enumerate(row):
                 w = cell_walls(ch)
                 px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
-                if w['N']: draw_line(self.img, px, py, px + self.tile, py, WALL_COLOR)
-                if w['S']: draw_line(self.img, px, py + self.tile, px + self.tile, py + self.tile, WALL_COLOR)
-                if w['W']: draw_line(self.img, px, py, px, py + self.tile, WALL_COLOR)
-                if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, WALL_COLOR)
+                if w['N']: draw_line(self.img, px, py, px + self.tile, py, self.wall_color)
+                if w['S']: draw_line(self.img, px, py + self.tile, px + self.tile, py + self.tile, self.wall_color)
+                if w['W']: draw_line(self.img, px, py, px, py + self.tile, self.wall_color)
+                if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, self.wall_color)
 
     def draw_closed_cells(self, color=0x808080):
         """ Function to xxx
@@ -231,14 +253,13 @@ class Maze():
             xxx
         """
         MOVES = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'W': (-1, 0)}
-        PATH_COLOR = 0xFF0000
         x, y = self.entry
         for move in self.path:
             dx, dy = MOVES[move]
             cx1, cy1 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
             x, y = x + dx, y + dy
             cx2, cy2 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
-            draw_line(self.img, cx1, cy1, cx2, cy2, PATH_COLOR)
+            draw_line(self.img, cx1, cy1, cx2, cy2, self.path_color)
 
     def fill_cell(self, x, y, color, margin=2):
         """ Function to xxx
