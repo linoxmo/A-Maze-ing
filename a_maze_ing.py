@@ -1,12 +1,8 @@
 def new_import() -> list:
-    """ Function to xxx
+    """Import the components required by the main program.
+    Args: none.
+    Returns: the imported components as a list."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     import sys
     from maze import MazeGenerator as mg
     from maze import output
@@ -17,14 +13,10 @@ def new_import() -> list:
 
 
 def main() -> None:
-    """ Function to xxx
+    """Generate the maze, write its data to a new file and display it in the terminal and on a graphical window.
+    Args: none.
+    Returns: none."""
 
-    Args:
-        None
-
-    Returns:
-        xxx
-    """
     try:
         tab = new_import()
         sys = tab[0]
