@@ -31,7 +31,7 @@ def cell_walls(hex_char: str) -> dict[str,bool]:
         'W': bool(v & 0b1000),
     }
 
-def draw_line(img, x0, y0, x1, y1, color):
+def draw_line(img, x0, y0, x1, y1, color) -> None:
     """Draw a line between two points on an image.
     Args: img is the image to draw on, x0 and y0 are the starting coordinates, x1 and y1 are the ending coordinates, color is the line color.
     Returns: none."""
@@ -65,6 +65,18 @@ def look_for_empty_line(tab: list[str]) -> int:
         compt +=1
     return compt
 
+def parse_color(value: str, default: int) -> int:
+    """Convertit une chaîne "0xRRGGBB" ou "#RRGGBB" en entier, ou renvoie default."""
+    if not value:
+        return default
+    value = value.strip().lstrip("#")
+    if value.lower().startswith("0x"):
+        value = value[2:]
+    try:
+        return int(value, 16)
+    except ValueError:
+        return default
+    
 class Maze():
     """Represent and graphically display a maze.
     Args: none.
@@ -88,11 +100,16 @@ class Maze():
         self.offset_X: int = 50
         self.offset_Y: int = 100
         self.tile: int = 32
+        self.wall_color: int = parse_color(get_variable("WALL_COLOR"), 0xFFFFFF)
+        self.pattern_color: int = parse_color(get_variable("PATTERN_COLOR"), 0x808080)
+        self.entry_color: int = parse_color(get_variable("ENTRY_COLOR"), 0x00FF00)
+        self.exit_color: int = parse_color(get_variable("EXIT_COLOR"), 0xFF0000)
+        self.path_color: int = parse_color(get_variable("PATH_COLOR"), 0xFF0000)
 
         self.close_btn: dict[str,int] = {"x": 900, "y": 10, "w": 80, "h": 30}
         self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
 
-    def load(self):
+    def load(self) -> None:
         """Load the maze, entry, exit and solution path from the output file (after function output).
         Args: none.
         Returns: none."""
@@ -105,24 +122,29 @@ class Maze():
         self.exit = tuple(int(d) for d in tab_lab[line + 2].split(","))
         self.path = tab_lab[line + 3]
 
-    def render(self):
+    def render(self) -> None:
         """Render the maze and its graphical elements on the image.
         Args: none.
         Returns: none."""
-
-        ENTRY_COLOR = 0x00FF00
-        EXIT_COLOR = 0xFF0000
         self.img = self.mlx.new_image(self.width, self.height)
         self.draw_maze()
-        self.draw_closed_cells()
-        self.fill_cell(self.entry[0], self.entry[1], ENTRY_COLOR)
-        self.fill_cell(self.exit[0], self.exit[1], EXIT_COLOR)
+        self.draw_pattern_cells()
+        self.fill_cell(self.entry[0], self.entry[1], self.entry_color)
+        self.fill_cell(self.exit[0], self.exit[1], self.exit_color)
         if self.show_path:
             self.draw_path()
         self._draw_button(self.close_btn, 0xFFFFFF)
         self._draw_button(self.toggle_btn, 0x0000FF)
+        
+    def draw_pattern_cells(self) -> None:
+        """Colore les cellules totalement murées (motif "42")."""
+        for y, row in enumerate(self.maze):
+            for x, ch in enumerate(row):
+                w = cell_walls(ch)
+                if all(w.values()):
+                    self.fill_cell(x, y, self.pattern_color)
 
-    def _draw_button(self, btn, color):
+    def _draw_button(self, btn, color) -> None:
         """Draw a rectangular button on the image.
         Args: btn contains the button position and dimensions, color is the color of the button.
         Returns: none."""
@@ -131,7 +153,7 @@ class Maze():
             for dx in range(btn["w"]):
                 self.img.pixel_put(btn["x"] + dx, btn["y"] + dy, color)
 
-    def redraw(self):
+    def redraw(self) -> None:
         """Display the current image and buttons and add the buttons' name on it.
         Args: none.
         Returns: none."""
@@ -140,12 +162,16 @@ class Maze():
         self.win.string_put(self.close_btn["x"] + 15, self.close_btn["y"] + 20, 0x00FF00, "Fermer")
         self.win.string_put(self.toggle_btn["x"] + 5, self.toggle_btn["y"] + 20, 0xFFFFFF, "Chemin")
 
-    def on_mouse_click(self, x, y):
-        """Detect if a mouse click is on the close or path toggle buttons.
-        Args: x and y are the coordinates of the mouse click.
-        Returns: none."""
-# La fonction n'activate pas the button if needed, tu confirmes ?
 
+    def on_mouse_click(self, btn: int, x: int, y: int) -> None:
+        """Detect if a mouse click is on the close or path toggle buttons.
+        Args:
+            btn: The mouse button that was pressed.
+            x: The x coordinate of the mouse click.
+            y: The y coordinate of the mouse click.
+        Returns:
+            None.
+        """
         if self._is_in(x, y, self.close_btn):
             self.mlx.loop_end()
         elif self._is_in(x, y, self.toggle_btn):
@@ -164,16 +190,14 @@ class Maze():
         """Draw the walls of every maze cell on the image.
         Args: none.
         Returns: none."""
-
-        WALL_COLOR = 0xFFFFFF
         for y, row in enumerate(self.maze):
             for x, ch in enumerate(row):
                 w = cell_walls(ch)
                 px, py = x * self.tile + self.offset_X, y * self.tile + self.offset_Y
-                if w['N']: draw_line(self.img, px, py, px + self.tile, py, WALL_COLOR)
-                if w['S']: draw_line(self.img, px, py + self.tile, px + self.tile, py + self.tile, WALL_COLOR)
-                if w['W']: draw_line(self.img, px, py, px, py + self.tile, WALL_COLOR)
-                if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, WALL_COLOR)
+                if w['N']: draw_line(self.img, px, py, px + self.tile, py, self.wall_color)
+                if w['S']: draw_line(self.img, px, py + self.tile, px + self.tile, py + self.tile, self.wall_color)
+                if w['W']: draw_line(self.img, px, py, px, py + self.tile, self.wall_color)
+                if w['E']: draw_line(self.img, px + self.tile, py, px + self.tile, py + self.tile, self.wall_color)
 
     def draw_closed_cells(self, color=0x808080):
         """Fill all maze cells that are closed on all four edges.
@@ -202,21 +226,16 @@ class Maze():
         Returns: none."""
 
         MOVES = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'W': (-1, 0)}
-        PATH_COLOR = 0xFF0000
         x, y = self.entry
         for move in self.path:
             dx, dy = MOVES[move]
             cx1, cy1 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
             x, y = x + dx, y + dy
             cx2, cy2 = (x * self.tile + self.tile // 2) + self.offset_X, (y * self.tile + self.tile // 2) + self.offset_Y
-            draw_line(self.img, cx1, cy1, cx2, cy2, PATH_COLOR)
+            draw_line(self.img, cx1, cy1, cx2, cy2, self.path_color)
 
 
 def mlx_rendering() -> None:
-    """Initialize the graphical window and start the maze display loop.
-    Args: none.
-    Returns: none."""
-
     mlx = Mlx()
     WIDTH = 1000
     HEIGHT = 1000

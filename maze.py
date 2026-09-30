@@ -14,15 +14,15 @@ class MazeGenerator():
         Returns: none."""
 
         new_conf: Config = create_conf()
-        self._width: int = new_conf.get_width() * 2
-        self._height: int = new_conf.get_height() * 2
-        entry: tuple[ int, int]= new_conf.get_entry()
-        exit: tuple[int, int] = new_conf.get_exit()
+        self._width: int = new_conf.width * 2
+        self._height: int = new_conf.height * 2
+        entry: tuple[ int, int]= new_conf.entry
+        exit: tuple[int, int] = new_conf.exit
         self._entry: tuple[int, int] = (entry[0] * 2, entry[1] * 2)
         self._exit: tuple[int, int] = (exit[0] * 2, exit[1] * 2)
-        self._isperfect: bool = new_conf.get_is_perfect()
-        self._seed: int | None = new_conf.get_seed()
-        self.o_file: str = new_conf.get_o_file()
+        self._isperfect: bool = new_conf.is_perfect
+        self._seed: int | None = new_conf.seed
+        self.o_file: str = new_conf.o_file
         self._directions: list[tuple[int,int]] = [(0, -2), (0, 2), (-2, 0), (2, 0)]
         self.maze : list[list[int]]
         self.sol : str = ""
@@ -58,7 +58,6 @@ class MazeGenerator():
             ny: int = y + dy
             if 0 <= nx < w and 0 <= ny < h:
                 if self.maze[ny][nx] == 1:
-                    #print(f"de ({x},{y}) vers ({nx},{ny}), mur creusé à ligne={y+dy//2} col={x+dx//2}")
                     self.maze[y + dy // 2 ][x + dx // 2] = 0
                     self.dfs(nx,ny)
 
@@ -67,7 +66,7 @@ class MazeGenerator():
         Args: none.
         Returns: the 42 pattern as a list of strings that would be stack one over the other to display the pattern."""
 
-        digit_4: list[str] = ["101", "101", "111", "001", "001"]
+        digit_4: list[str] = ["100", "100", "111", "001", "001"]
         digit_2: list[str] = ["111", "001", "111", "100", "111"]
         return [d4 + "0" + d2 for d4, d2 in zip(digit_4, digit_2)]
 
@@ -109,11 +108,12 @@ class MazeGenerator():
 
         seed: int | None = self._seed
         if seed is not None:
-            print(seed)
             rd.seed(seed)
         self.init_maze()
         self.apply_pattern_blocks()
         self.dfs(x, y)
+        if not self._isperfect:
+            self.remove_dead_ends()
         en_x, en_y = self._entry
         self.bfs(en_x, en_y)
         return self.maze
@@ -154,7 +154,6 @@ class MazeGenerator():
         Returns: the corresponding cardinal direction as a string."""
 
         directions = self.get_directions()
-        print(directions[0])
         if vector == directions[0]:
             return("N")
         elif vector == directions[1]:
@@ -175,11 +174,9 @@ class MazeGenerator():
         directions = self.get_directions()
         queue = dq()
         visited = {(start_x, start_y)}
-        print("start",  start_x, start_y)
 
         queue.append((start_x, start_y, ""))
         while queue:
-            print(queue)
             x, y, path = queue.popleft()
             if x == exit_x and y == exit_y:
                 self.path = path
@@ -188,15 +185,40 @@ class MazeGenerator():
                 nx = x + dx
                 ny = y + dy
                 mid_x, mid_y = x + dx // 2, y + dy // 2
-                #print("nx , ny: ", nx ,ny)
                 if 0 <= nx < self._width and 0 <= ny < self._height:
                     if (nx,ny) not in visited and self.maze[ny][nx] == 0 and self.maze[mid_y][mid_x] == 0:
                         visited.add((nx,ny))
-                        #print("dx,dy :", dx, dy)
                         letter: str = self.add_directions((dx, dy))
                         queue.append((nx, ny, path + letter ))
         return None
 
+    def remove_dead_ends(self) -> None:
+        """ Function that the find the dead ends and open than randomly
+            Args:
+                self
+            Returns:
+                None
+            """
+        for y in range(0, self._height, 2):
+            for x in range(0, self._width, 2):
+                if self.maze[y][x] == 2:  
+                    continue
+
+                open_count = 0
+                closable = []
+                for dx, dy in self.get_directions():
+                    nx, ny = x + dx, y + dy
+                    if not (0 <= nx < self._width and 0 <= ny < self._height):
+                        continue
+                    mx, my = x + dx // 2, y + dy // 2
+                    if self.maze[my][mx] == 0:
+                        open_count += 1
+                    elif self.maze[ny][nx] == 0:
+                        closable.append((mx, my))
+
+                if open_count == 1 and closable:
+                    mx, my = rd.choice(closable)
+                    self.maze[my][mx] = 0
 
 def output(maze: MazeGenerator) -> None:
     """Write the maze entry, exit and solution path to the configured output file.
@@ -213,18 +235,4 @@ def output(maze: MazeGenerator) -> None:
         f.write("\n")
         f.write(f"{exit[0] // 2}, {exit[1] // 2} ")
         f.write("\n")
-        f.write(maze.path)
 
-
-# if __name__ == '__main__':
-#     """A supprimer c'est ca ?"""
-
-#     maze = MazeGenerator()
-#     grille = maze.create_maze(0,0)
-#     #for ligne in grille:
-#     #    texte = "".join(["#" if c == 1 else ("P" if c == "P" else " ") for c in ligne])
-#     #    print(texte)
-#     maze.convert_maze()
-#     #print(maze.sol)
-#     #print(maze.path)
-#     output(maze)

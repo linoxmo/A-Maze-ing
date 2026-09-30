@@ -1,5 +1,3 @@
-from termios import VQUIT
-from unittest.loader import VALID_MODULE_NAME
 from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
 from typing import Optional
