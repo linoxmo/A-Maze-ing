@@ -113,10 +113,10 @@ class MazeGenerator():
             rd.seed(seed)
         self.init_maze()
         self.apply_pattern_blocks()
-        #if self.maze[self._entry[0]][self._entry[1]] == 2 or self.maze[self._exit[0] + 1][self._exit[1] + 1] == 2:
-        blocked = self.blocked_cells()
-        if (self.maze[self._entry[0]][self._entry[1]] // 2) in blocked or self.maze[self._exit[0] + 1][self._exit[1] + 1] in blocked:
-            raise Exception(" Entry or Exit can't be on the 42")
+        en_x, en_y = self._entry
+        ex_x, ex_y = self._exit
+        if self.maze[en_y][en_x] == 2 or self.maze[ex_y][ex_x] == 2:
+            raise Exception("Entry can't be on the 42")
         self.dfs(x, y)
         if not self._isperfect:
             self.remove_dead_ends()
