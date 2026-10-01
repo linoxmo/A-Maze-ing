@@ -4,9 +4,9 @@ def new_import() -> list:
     Returns: the imported components as a list."""
 
     import sys
-    from maze import MazeGenerator as mg
-    from maze import output
-    from representation import mlx_rendering as mlxr
+    from mazagen.maze import MazeGenerator as mg
+    from mazagen.maze import output
+    from mazagen.representation import mlx_rendering as mlxr
 
     tab_import = [sys, mg, mlxr, output]
     return tab_import

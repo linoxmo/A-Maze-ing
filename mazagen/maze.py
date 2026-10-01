@@ -1,4 +1,4 @@
-from parsing import create_conf,Config
+from mazagen.parsing import create_conf,Config
 import random as rd
 from collections import deque as dq
 
