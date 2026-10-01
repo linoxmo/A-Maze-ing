@@ -100,6 +100,8 @@ class MazeGenerator():
             row: int = r * 2
             col: int = c * 2
             self.maze[row][col] = 2
+            # if (row,col) == self._entry or (row,col) == self._exit:
+            #     raise Exception(" Entry or Exit can't be on the 42")
 
     def create_maze(self, x , y) -> list[list[int]]:
         """Generate the maze and find the path between its configured entry and exit.
@@ -111,6 +113,10 @@ class MazeGenerator():
             rd.seed(seed)
         self.init_maze()
         self.apply_pattern_blocks()
+        #if self.maze[self._entry[0]][self._entry[1]] == 2 or self.maze[self._exit[0] + 1][self._exit[1] + 1] == 2:
+        blocked = self.blocked_cells()
+        if (self.maze[self._entry[0]][self._entry[1]] // 2) in blocked or self.maze[self._exit[0] + 1][self._exit[1] + 1] in blocked:
+            raise Exception(" Entry or Exit can't be on the 42")
         self.dfs(x, y)
         if not self._isperfect:
             self.remove_dead_ends()

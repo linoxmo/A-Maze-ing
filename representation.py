@@ -3,6 +3,12 @@ from dotenv import load_dotenv
 from parsing import get_variable
 import os
 from typing import Any
+import random as rd
+from parsing import create_conf
+
+
+colors: list[int] = [0xFFFFFF, 0x808080, 0x00FF00, 0xFF0000, 0x800000, 0xFF69B4, 0xFF7F50, 0x0000FF, \
+0x00FFFF, 0x000080, 0x40E0D0, 0x808000, 0x00FF00, 0x008000, 0x50C878, 0xFFFF00, 0xFFA500, 0x800080]
 
 
 def prep() -> str:
@@ -76,7 +82,17 @@ def parse_color(value: str, default: int) -> int:
         return int(value, 16)
     except ValueError:
         return default
-    
+
+
+def rd_colors() -> list[int]:
+    cp_colors: list[int] = list(colors)
+    set_colors: list[int] = []
+    for _ in range(5):
+        i:int = rd.randint(0,len(cp_colors) - 1)
+        set_colors.append(cp_colors.pop(i))
+    return set_colors
+
+
 class Maze():
     """Represent and graphically display a maze.
     Args: none.
@@ -92,23 +108,28 @@ class Maze():
         self.img: Any = img
         self.width: int = width
         self.height: int = height
+        self.window_width: int = 1300
+        self.window_height: int = 1000
         self.maze:  list[str]
         self.entry: tuple[int, ...]
         self.exit:  tuple[int, ...]
         self.path: str
         self.show_path: bool = False
-        self.offset_X: int = 50
-        self.offset_Y: int = 100
-        self.tile: int = 32
-        self.wall_color: int = parse_color(get_variable("WALL_COLOR"), 0xFFFFFF)
-        self.pattern_color: int = parse_color(get_variable("PATTERN_COLOR"), 0x808080)
-        self.entry_color: int = parse_color(get_variable("ENTRY_COLOR"), 0x00FF00)
-        self.exit_color: int = parse_color(get_variable("EXIT_COLOR"), 0xFF0000)
-        self.path_color: int = 0xFF0000 #parse_color(get_variable("PATH_COLOR"), 0xFF0000)
- 
-        self.close_btn: dict[str,int] = {"x": 900, "y": 10, "w": 80, "h": 30}
-        self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
-        self.newc_btn: dict[str, int] = {"x": 900, "y": 110, "w": 80, "h": 30}
+        self.offset_X: int = 20
+        self.offset_Y: int = 20
+        config = create_conf()
+        size_max: int = max(config.height, config.width)
+        self.tile: int = (self.window_height - 100) // size_max
+        set_colors: list[int] = rd_colors()
+        self.wall_color: int = set_colors[0]
+        self.pattern_color: int = set_colors[1]
+        self.entry_color: int = set_colors[2]
+        self.exit_color: int = set_colors[3]
+        self.path_color: int = set_colors[4]
+        self.close_btn: dict[str,int] = {"x": 1100, "y": 100, "w": 150, "h": 30}
+        self.toggle_btn: dict[str,int] = {"x": 1100, "y": 200, "w": 150, "h": 30}
+        self.newc_btn: dict[str, int] = {"x": 1100, "y": 300, "w": 150, "h": 30}
+        self.changes_color: dict[str, int] = {"x": 1100, "y": 400, "w": 150, "h": 30}
 
     def load(self) -> None:
         """Load the maze, entry, exit and solution path from the output file (after function output).
@@ -134,9 +155,11 @@ class Maze():
         self.fill_cell(self.exit[0], self.exit[1], self.exit_color)
         if self.show_path:
             self.draw_path()
-        self._draw_button(self.close_btn, 0xFFFFFF)
-        self._draw_button(self.toggle_btn, 0x0000FF)
-        
+        self._draw_button(self.close_btn, 0x002147)
+        self._draw_button(self.toggle_btn, 0x4A0000)
+        self._draw_button(self.newc_btn, 0x013220)
+        self._draw_button(self.changes_color, 0x301934)
+
     def draw_pattern_cells(self) -> None:
         """Colore les cellules totalement murées (motif "42")."""
         for y, row in enumerate(self.maze):
@@ -160,8 +183,10 @@ class Maze():
         Returns: none."""
 
         self.win.put_image(self.img)
-        self.win.string_put(self.close_btn["x"] + 15, self.close_btn["y"] + 20, 0x00FF00, "Fermer")
-        self.win.string_put(self.toggle_btn["x"] + 5, self.toggle_btn["y"] + 20, 0xFFFFFF, "Chemin")
+        self.win.string_put(self.close_btn["x"] + 10, self.close_btn["y"] + 20, 0xFFFFFF, "Close")
+        self.win.string_put(self.toggle_btn["x"] + 10, self.toggle_btn["y"] + 20, 0xFFFFFF, "Path")
+        self.win.string_put(self.changes_color["x"] + 10, self.changes_color["y"] + 20, 0xFFFFFF, "Change Color")
+        self.win.string_put(self.newc_btn["x"] + 10, self.newc_btn["y"] + 20, 0xFFFFFF, "Regenerate a new Maze")
 
 
     def on_mouse_click(self, btn: int, x: int, y: int) -> None:
@@ -239,7 +264,7 @@ class Maze():
 def mlx_rendering() -> None:
     """Function that create a solution"""
     mlx = Mlx()
-    WIDTH = 1000
+    WIDTH = 1500
     HEIGHT = 1000
     win = mlx.new_window(WIDTH, HEIGHT, "Labyrinthe")
     img = mlx.new_image(WIDTH, HEIGHT)
