@@ -1,4 +1,4 @@
-from mazagen.parsing import create_conf,Config
+from mazagen.parsing import create_conf, Config
 import random as rd
 from collections import deque as dq
 
@@ -16,19 +16,20 @@ class MazeGenerator():
         new_conf: Config = create_conf()
         self._width: int = new_conf.width * 2
         self._height: int = new_conf.height * 2
-        entry: tuple[ int, int]= new_conf.entry
+        entry: tuple[int, int] = new_conf.entry
         exit: tuple[int, int] = new_conf.exit
         self._entry: tuple[int, int] = (entry[0] * 2, entry[1] * 2)
         self._exit: tuple[int, int] = (exit[0] * 2, exit[1] * 2)
         self._isperfect: bool = new_conf.is_perfect
         self._seed: int | None = new_conf.seed
         self.o_file: str = new_conf.o_file
-        self._directions: list[tuple[int,int]] = [(0, -2), (0, 2), (-2, 0), (2, 0)]
-        self.maze : list[list[int]]
-        self.sol : str = ""
+        self._directions: list[tuple[int, int]] = [
+            (0, -2), (0, 2), (-2, 0), (2, 0)]
+        self.maze: list[list[int]]
+        self.sol: str = ""
         self.path: str = ""
 
-    def get_directions(self) -> list[tuple[int,int]]:
+    def get_directions(self) -> list[tuple[int, int]]:
         """Return a copy of the possible movement directions.
         Args: none.
         Returns: the possible next movement directions as a list."""
@@ -40,12 +41,15 @@ class MazeGenerator():
         Args: none.
         Returns: the initialized maze grid."""
 
-        self.maze: list[list[int]] = [[ 1 for _ in range(self._width)] for _ in range (self._height)]
+        self.maze = [
+            [1 for _ in range(self._width)] for _ in range(self._height)]
         return self.maze
 
-    def dfs(self, x , y) -> None:
-        """Carve maze passages recursively from the given coordinates using DFS.
-        Args: x and y are the starting coordinates in the internal maze grid.
+    def dfs(self, x: int, y: int) -> None:
+        """Carve maze passages recursively from the given coordinates
+        using DFS.
+        Args: x and y are the starting coordinates in the internal
+        maze grid.
         Returns: none."""
 
         w: int = self._width
@@ -53,25 +57,27 @@ class MazeGenerator():
         self.maze[y][x] = 0
         directions = self.get_directions()
         rd.shuffle(directions)
-        for dx, dy in directions :
+        for dx, dy in directions:
             nx: int = x + dx
             ny: int = y + dy
             if 0 <= nx < w and 0 <= ny < h:
                 if self.maze[ny][nx] == 1:
-                    self.maze[y + dy // 2 ][x + dx // 2] = 0
-                    self.dfs(nx,ny)
+                    self.maze[y + dy // 2][x + dx // 2] = 0
+                    self.dfs(nx, ny)
 
     def build_pattern(self) -> list[str]:
         """Build the binary pattern representing the number 42.
         Args: none.
-        Returns: the 42 pattern as a list of strings that would be stack one over the other to display the pattern."""
+        Returns: the 42 pattern as a list of strings that would be
+        stack one over the other to display the pattern."""
 
         digit_4: list[str] = ["100", "100", "111", "001", "001"]
         digit_2: list[str] = ["111", "001", "111", "100", "111"]
         return [d4 + "0" + d2 for d4, d2 in zip(digit_4, digit_2)]
 
     def blocked_cells(self) -> set[tuple[int, int]]:
-        """Determine the cells to block to form 42 pattern in the center of the maze.
+        """Determine the cells to block to form 42 pattern in the
+        center of the maze.
         Args: none.
         Returns: the coordinates of the cells to block."""
 
@@ -101,9 +107,11 @@ class MazeGenerator():
             col: int = c * 2
             self.maze[row][col] = 2
 
-    def create_maze(self, x , y) -> list[list[int]]:
-        """Generate the maze and find the path between its configured entry and exit.
-        Args: x and y are the starting coordinates for maze generation.
+    def create_maze(self, x: int, y: int) -> list[list[int]]:
+        """Generate the maze and find the path between its
+        configured entry and exit.
+        Args: x and y are the starting coordinates
+        for maze generation.
         Returns: the generated maze grid."""
 
         seed: int | None = self._seed
@@ -122,10 +130,11 @@ class MazeGenerator():
         self.bfs(en_x, en_y)
         return self.maze
 
-    def is_wall(self, i, j) -> bool:
+    def is_wall(self, i: int, j: int) -> bool:
         """Check whether the given position represents a wall.
         Args: i and j are the row and column coordinates to check.
-        Returns: true if the position is a wall or outside the maze, otherwise false."""
+        Returns: true if the position is a wall or outside the
+        maze, otherwise false."""
 
         if i < 0 or i >= self._height or j < 0 or j >= self._width:
             return True
@@ -137,7 +146,7 @@ class MazeGenerator():
         Returns: none."""
 
         hex_digits: str = "0123456789ABCDEF"
-        self.sol: str = ""
+        self.sol = ""
         for i in range(0, self._height, 2):
             for j in range(0, self._width, 2):
                 value = 0
@@ -152,31 +161,34 @@ class MazeGenerator():
                 self.sol += hex_digits[value]
             self.sol += "\n"
 
-    def add_directions(self, vector: tuple[int,int]) -> str:
-        """Convert a movement vector into its cardinal direction (N, W, S, E).
+    def add_directions(self, vector: tuple[int, int]) -> str:
+        """Convert a movement vector into its cardinal direction
+        (N, W, S, E).
         Args: a vector.
         Returns: the corresponding cardinal direction as a string."""
 
         directions = self.get_directions()
         if vector == directions[0]:
-            return("N")
+            return ("N")
         elif vector == directions[1]:
-            return("S")
+            return ("S")
         elif vector == directions[2]:
-            return("W")
+            return ("W")
         elif vector == directions[3]:
-            return("E")
+            return ("E")
         else:
-             return("None")
+            return ("None")
 
-    def bfs(self, start_x , start_y) -> None:
-        """Find a path from the given starting coordinates to the maze exit using BFS.
-        Args: start_x and start_y are the starting coordinates in the internal maze grid.
+    def bfs(self, start_x: int, start_y: int) -> None:
+        """Find a path from the given starting coordinates to the
+        maze exit using BFS.
+        Args: start_x and start_y are the starting coordinates in
+        the internal maze grid.
         Returns: none."""
 
         exit_x, exit_y = self._exit
         directions = self.get_directions()
-        queue = dq()
+        queue: dq = dq()
         visited = {(start_x, start_y)}
 
         queue.append((start_x, start_y, ""))
@@ -190,10 +202,11 @@ class MazeGenerator():
                 ny = y + dy
                 mid_x, mid_y = x + dx // 2, y + dy // 2
                 if 0 <= nx < self._width and 0 <= ny < self._height:
-                    if (nx,ny) not in visited and self.maze[ny][nx] == 0 and self.maze[mid_y][mid_x] == 0:
-                        visited.add((nx,ny))
+                    if (nx, ny) not in visited and self.maze[ny][nx] == 0 \
+                            and self.maze[mid_y][mid_x] == 0:
+                        visited.add((nx, ny))
                         letter: str = self.add_directions((dx, dy))
-                        queue.append((nx, ny, path + letter ))
+                        queue.append((nx, ny, path + letter))
         return None
 
     def remove_dead_ends(self) -> None:
@@ -212,7 +225,8 @@ class MazeGenerator():
                 closable = []
                 for dx, dy in self.get_directions():
                     nx, ny = x + dx, y + dy
-                    if not (0 <= nx < self._width and 0 <= ny < self._height):
+                    if not (0 <= nx < self._width and
+                            0 <= ny < self._height):
                         continue
                     mx, my = x + dx // 2, y + dy // 2
                     if self.maze[my][mx] == 0:
@@ -224,9 +238,12 @@ class MazeGenerator():
                     mx, my = rd.choice(closable)
                     self.maze[my][mx] = 0
 
+
 def output(maze: MazeGenerator) -> None:
-    """Write the maze entry, exit and solution path to the configured output file.
-    Args: maze is the MazeGenerator containing the data to write.
+    """Write the maze entry, exit and solution path to
+    the configured output file.
+    Args: maze is the MazeGenerator containing the data
+    to write.
     Returns: none."""
 
     fichier: str = maze.o_file

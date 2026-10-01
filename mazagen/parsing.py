@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
-from typing import Optional
+from typing import Optional, Any
 import os
 
 try:
@@ -10,23 +10,26 @@ try:
 
     class Config(BaseModel):
         """Represent and validate the maze configuration.
-        Args: width, height, entry, exit, o_file, is_perfect, optional seed are the maze configuration values.
+        Args: width, height, entry, exit, o_file, is_perfect,
+        optional seed are the maze configuration values.
         Returns: none."""
 
         width: int = Field(ge=2, le=50)
         height: int = Field(ge=2, le=50)
-        entry:tuple[int, int]
+        entry: tuple[int, int]
         exit: tuple[int, int]
         o_file: str
         is_perfect: bool
-        seed:Optional[int] = Field(default = None , ge = 0)
+        seed: Optional[int] = Field(default=None, ge=0)
 
-        @model_validator(mode = "before")
+        @model_validator(mode="before")
         @classmethod
-        def check_perfect(cls, data):
-            """Validate and convert the PERFECT configuration value to a boolean.
+        def check_perfect(cls, data: dict[str, Any]) -> dict[str, Any]:
+            """Validate and convert the PERFECT configuration value
+            to a boolean.
             Args: data contains the configuration values to validate.
-            Returns: the configuration data with PERFECT converted to a boolean. """
+            Returns: the configuration data with PERFECT converted
+            to a boolean."""
 
             perfect = data.get("is_perfect")
             if not isinstance(perfect, str):
@@ -36,7 +39,7 @@ try:
             data["is_perfect"] = perfect.lower() == "true"
             return data
 
-        @model_validator(mode = "after")
+        @model_validator(mode="after")
         def check_coordinates(self) -> "Config":
             """Validate the entry and exit coordinates of the maze.
             Args: none.
@@ -51,8 +54,10 @@ try:
 
     def get_variable(name: str, default: Optional[str] = None) -> str:
         """Get an environment variable by its name.
-        Args: name is the variable to get and default is its optional default value.
-        Returns: the variable value, its default value or "Missing" if neither exists."""
+        Args: name is the variable to get and default is its optional
+        default value.
+        Returns: the variable value, its default value or "Missing"
+        if neither exists."""
 
         value = os.getenv(name, default)
         if value is None:
@@ -70,21 +75,21 @@ try:
 
         if seed != "Missing":
             return Config(
-                width = int(get_variable("WIDTH")),
-                height = int(get_variable("HEIGHT")),
-                entry = (int(entry[0]), int(entry[1])),
-                exit = (int(exit[0]), int(exit[1])),
-                o_file = get_variable("OUTPUT_FILE"),
+                width=int(get_variable("WIDTH")),
+                height=int(get_variable("HEIGHT")),
+                entry=(int(entry[0]), int(entry[1])),
+                exit=(int(exit[0]), int(exit[1])),
+                o_file=get_variable("OUTPUT_FILE"),
                 is_perfect=get_variable("PERFECT"),
-                seed = int(get_variable("SEED"))
+                seed=int(get_variable("SEED"))
             )
-        else :
+        else:
             return Config(
-                width = int(get_variable("WIDTH")),
-                height = int(get_variable("HEIGHT")),
-                entry = (int(entry[0]), int(entry[1])),
-                exit = (int(exit[0]), int(exit[1])),
-                o_file = get_variable("OUTPUT_FILE"),
+                width=int(get_variable("WIDTH")),
+                height=int(get_variable("HEIGHT")),
+                entry=(int(entry[0]), int(entry[1])),
+                exit=(int(exit[0]), int(exit[1])),
+                o_file=get_variable("OUTPUT_FILE"),
                 is_perfect=get_variable("PERFECT")
             )
 
