@@ -11,9 +11,13 @@ def new_import() -> list:
     tab_import = [sys, mg, mlxr, output]
     return tab_import
 
-def the_maze(mg, output):
+def the_maze(mg, output) -> None:
+    """Generate the maze, write its data to the same file and display it in the terminal and on a graphical window.
+    Args: MazeGenerator as mg, output.
+    Returns: none."""
+
     maze = mg()
-    grille = maze.create_maze(0,0)
+    _ = maze.create_maze(0,0)
     maze.convert_maze()
     output(maze)
 

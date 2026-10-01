@@ -3,15 +3,20 @@ PYTHON = python3
 VENV = .venv
 PIP = $(VENV)/bin/pip
 PYTHON_VENV = $(VENV)/bin/python
+TMP = $(VENV)/.install
 
 all: install
 
-$(VENV):
+$(VENV)/bin/activate:
 	$(PYTHON) -m venv $(VENV)
+	$(PIP) install --upgrade pip
 
-install: $(VENV)
+$(TMP): requirements.txt $(VENV)/bin/activate
 	$(PIP) install -r requirements.txt
 	$(PIP) install flake8 mypy
+	touch $(TMP)
+
+install: $(TMP)
 
 run: install
 	$(PYTHON_VENV) $(NAME) .env

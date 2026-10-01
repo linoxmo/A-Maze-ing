@@ -110,18 +110,16 @@ class Maze():
         self.img: Any = img
         self.width: int = width
         self.height: int = height
-        self.window_width: int = 1300
-        self.window_height: int = 1000
-        self.maze:  list[str]
+        self.maze: list[str]
         self.entry: tuple[int, ...]
-        self.exit:  tuple[int, ...]
+        self.exit: tuple[int, ...]
         self.path: str
         self.show_path: bool = False
         self.offset_X: int = 20
         self.offset_Y: int = 20
         config = create_conf()
         size_max: int = max(config.height, config.width)
-        self.tile: int = (self.window_height - 100) // size_max
+        self.tile: int = (self.height - 100) // size_max
         set_colors: list[int] = rd_colors()
         self.wall_color: int = set_colors[0]
         self.pattern_color: int = set_colors[1]

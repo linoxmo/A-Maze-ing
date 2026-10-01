@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from typing import Optional
 import os
 
-try:    
+try:
     is_env: bool = load_dotenv()
     if not is_env:
         raise Exception("Please don't be a prick and create your .env")
@@ -49,7 +49,6 @@ try:
                 raise ValueError("entry and exit must be different")
             return self
 
-
     def get_variable(name: str, default: Optional[str] = None) -> str:
         """Get an environment variable by its name.
         Args: name is the variable to get and default is its optional default value.
@@ -59,7 +58,6 @@ try:
         if value is None:
             return "Missing"
         return value
-
 
     def create_conf() -> Config:
         """Create the maze configuration based on the environment variables.
@@ -92,5 +90,3 @@ try:
 
 except Exception as e:
     print(e)
-
-
