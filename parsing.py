@@ -3,8 +3,12 @@ from dotenv import load_dotenv
 from typing import Optional
 import os
 
-
-load_dotenv()
+try:    
+    is_env: bool = load_dotenv()
+    if not is_env:
+        raise Exception("Please don't be a prick and create your .env")
+except Exception as e:
+    print(e)
 
 
 class Config(BaseModel):

@@ -104,8 +104,8 @@ class Maze():
         self.pattern_color: int = parse_color(get_variable("PATTERN_COLOR"), 0x808080)
         self.entry_color: int = parse_color(get_variable("ENTRY_COLOR"), 0x00FF00)
         self.exit_color: int = parse_color(get_variable("EXIT_COLOR"), 0xFF0000)
-        self.path_color: int = parse_color(get_variable("PATH_COLOR"), 0xFF0000)
-
+        self.path_color: int = 0xFF0000 #parse_color(get_variable("PATH_COLOR"), 0xFF0000)
+ 
         self.close_btn: dict[str,int] = {"x": 900, "y": 10, "w": 80, "h": 30}
         self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
 
@@ -236,6 +236,7 @@ class Maze():
 
 
 def mlx_rendering() -> None:
+    """Function that create a solution"""
     mlx = Mlx()
     WIDTH = 1000
     HEIGHT = 1000

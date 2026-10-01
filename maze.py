@@ -235,4 +235,4 @@ def output(maze: MazeGenerator) -> None:
         f.write("\n")
         f.write(f"{exit[0] // 2}, {exit[1] // 2} ")
         f.write("\n")
-
+        f.write(maze.path)
