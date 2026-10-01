@@ -1,0 +1,4 @@
+pydantic
+python-dotenv
+minilibx-python
+build
