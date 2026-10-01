@@ -11,6 +11,12 @@ def new_import() -> list:
     tab_import = [sys, mg, mlxr, output]
     return tab_import
 
+def the_maze(mg, output):
+    maze = mg()
+    grille = maze.create_maze(0,0)
+    maze.convert_maze()
+    output(maze)
+
 def main() -> None:
     """Generate the maze, write its data to a new file and display it in the terminal and on a graphical window.
     Args: none.
@@ -25,10 +31,7 @@ def main() -> None:
         if len(sys.argv) != 2:
             print("Error: input should be \' python3 a_maze_ing.py .env\'")
             return
-        maze = mg()
-        grille = maze.create_maze(0,0)
-        maze.convert_maze()
-        output(maze)
+        the_maze(mg, output)
         mlxr()
     except Exception as e:
         print(e)

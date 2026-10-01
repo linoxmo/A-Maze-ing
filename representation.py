@@ -5,6 +5,8 @@ import os
 from typing import Any
 import random as rd
 from parsing import create_conf
+from time import sleep
+from a_maze_ing import the_maze
 
 
 colors: list[int] = [0xFFFFFF, 0x808080, 0x00FF00, 0xFF0000, 0x800000, 0xFF69B4, 0xFF7F50, 0x0000FF, \
@@ -190,7 +192,7 @@ class Maze():
 
 
     def on_mouse_click(self, btn: int, x: int, y: int) -> None:
-        """Detect if a mouse click is on the close or path toggle buttons.
+        """Detect if a mouse click is on the buttons.
         Args:
             btn: The mouse button that was pressed.
             x: The x coordinate of the mouse click.
@@ -203,6 +205,22 @@ class Maze():
         elif self._is_in(x, y, self.toggle_btn):
             self.show_path = not self.show_path
             self.render()
+        elif self._is_in(x, y, self.changes_color):
+            set_colors: list[int] = rd_colors()
+            self.wall_color: int = set_colors[0]
+            self.pattern_color: int = set_colors[1]
+            self.entry_color: int = set_colors[2]
+            self.exit_color: int = set_colors[3]
+            self.path_color: int = set_colors[4]
+            self.render()
+        elif self._is_in(x, y, self.newc_btn):
+            from maze import MazeGenerator as mg
+            from maze import output
+            the_maze(mg, output)
+            prep()
+            self.load()
+            self.render()
+
 
     @staticmethod
     def _is_in(x, y, btn):
@@ -262,7 +280,7 @@ class Maze():
 
 
 def mlx_rendering() -> None:
-    """Function that create a solution"""
+    """Function that shows a solution"""
     mlx = Mlx()
     WIDTH = 1500
     HEIGHT = 1000
