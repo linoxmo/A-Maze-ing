@@ -108,6 +108,7 @@ class Maze():
  
         self.close_btn: dict[str,int] = {"x": 900, "y": 10, "w": 80, "h": 30}
         self.toggle_btn: dict[str,int] = {"x": 900, "y": 60, "w": 80, "h": 30}
+        self.newc_btn: dict[str, int] = {"x": 900, "y": 110, "w": 80, "h": 30}
 
     def load(self) -> None:
         """Load the maze, entry, exit and solution path from the output file (after function output).
