@@ -25,8 +25,8 @@ debug: install
 	$(PYTHON_VENV) -m pdb $(NAME) .env
 
 lint: install
-	$(VENV)/bin/flake8 .
-	$(VENV)/bin/mypy . \
+	$(VENV)/bin/flake8 mazegen
+	$(VENV)/bin/mypy mazegen \
 		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \

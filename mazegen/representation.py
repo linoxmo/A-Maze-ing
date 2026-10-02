@@ -1,10 +1,10 @@
 from pymlx import Mlx
 from dotenv import load_dotenv
-from mazagen.parsing import get_variable
+from mazegen.parsing import get_variable
 import os
 from typing import Any
 import random as rd
-from mazagen.parsing import create_conf
+from mazegen.parsing import create_conf
 from a_maze_ing import the_maze
 
 
@@ -238,9 +238,9 @@ class Maze():
             self.path_color = set_colors[4]
             self.render()
         elif self._is_in(x, y, self.newc_btn):
-            from mazagen.maze import MazeGenerator as mg
-            from mazagen.maze import output
-            the_maze(mg, output)
+            from mazegen.maze import MazeGenerator
+            from mazegen.maze import output
+            the_maze(MazeGenerator, output)
             prep()
             self.load()
             self.render()

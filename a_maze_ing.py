@@ -1,4 +1,4 @@
-from mazagen.maze import MazeGenerator
+from mazegen.maze import MazeGenerator
 from typing import Callable
 
 
@@ -8,15 +8,15 @@ def new_import() -> list:
     Returns: the imported components as a list."""
 
     import sys
-    from mazagen.maze import MazeGenerator as mg
-    from mazagen.maze import output
-    from mazagen.representation import mlx_rendering as mlxr
+    from mazegen.maze import MazeGenerator as mg
+    from mazegen.maze import output
+    from mazegen.representation import mlx_rendering as mlxr
 
     tab_import = [sys, mg, mlxr, output]
     return tab_import
 
 
-def the_maze(mg: MazeGenerator, output: Callable) -> None:
+def the_maze(mg: type[MazeGenerator], output: Callable) -> None:
     """Generate the maze, write its data to the same file and
     display it in the terminal and on a graphical window.
     Args: MazeGenerator as mg, output.

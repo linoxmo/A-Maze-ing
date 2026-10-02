@@ -1,4 +1,4 @@
-from mazagen.parsing import create_conf, Config
+from mazegen.parsing import create_conf, Config
 import random as rd
 from collections import deque as dq
 
@@ -122,7 +122,7 @@ class MazeGenerator():
         en_x, en_y = self._entry
         ex_x, ex_y = self._exit
         if self.maze[en_y][en_x] == 2 or self.maze[ex_y][ex_x] == 2:
-            raise Exception("Entry can't be on the 42")
+            raise Exception("Entry or Exit can't be on the 42")
         self.dfs(x, y)
         if not self._isperfect:
             self.remove_dead_ends()

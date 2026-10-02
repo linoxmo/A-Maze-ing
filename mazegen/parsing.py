@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
-from typing import Optional, Any
+from typing import Optional
 import os
 
 try:
@@ -21,23 +21,6 @@ try:
         o_file: str
         is_perfect: bool
         seed: Optional[int] = Field(default=None, ge=0)
-
-        @model_validator(mode="before")
-        @classmethod
-        def check_perfect(cls, data: dict[str, Any]) -> dict[str, Any]:
-            """Validate and convert the PERFECT configuration value
-            to a boolean.
-            Args: data contains the configuration values to validate.
-            Returns: the configuration data with PERFECT converted
-            to a boolean."""
-
-            perfect = data.get("is_perfect")
-            if not isinstance(perfect, str):
-                raise ValueError("PERFECT must be 'True' or 'False'")
-            if perfect.lower() not in ("true", "false"):
-                raise ValueError("PERFECT must be 'True' or 'False'")
-            data["is_perfect"] = perfect.lower() == "true"
-            return data
 
         @model_validator(mode="after")
         def check_coordinates(self) -> "Config":
@@ -73,6 +56,10 @@ try:
         exit = get_variable("EXIT").split(",")
         seed = get_variable("SEED")
 
+        if get_variable("PERFECT").lower() != "true" and \
+                get_variable("PERFECT").lower() != "false":
+            raise Exception(" PERFECT must be True or False")
+
         if seed != "Missing":
             return Config(
                 width=int(get_variable("WIDTH")),
@@ -80,7 +67,7 @@ try:
                 entry=(int(entry[0]), int(entry[1])),
                 exit=(int(exit[0]), int(exit[1])),
                 o_file=get_variable("OUTPUT_FILE"),
-                is_perfect=get_variable("PERFECT"),
+                is_perfect=get_variable("PERFECT").lower() == "true",
                 seed=int(get_variable("SEED"))
             )
         else:
@@ -90,7 +77,7 @@ try:
                 entry=(int(entry[0]), int(entry[1])),
                 exit=(int(exit[0]), int(exit[1])),
                 o_file=get_variable("OUTPUT_FILE"),
-                is_perfect=get_variable("PERFECT")
+                is_perfect=get_variable("PERFECT").lower() == "true"
             )
 
 except Exception as e:
