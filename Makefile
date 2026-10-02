@@ -32,6 +32,13 @@ lint: install
 		--ignore-missing-imports \
 		--disallow-untyped-defs \
 		--check-untyped-defs
+	/bin/flake8 a_maze_ing.py
+	/bin/mypy a_maze_ing.py \
+		--warn-return-any \
+		--warn-unused-ignores \
+		--ignore-missing-imports \
+		--disallow-untyped-defs \
+		--check-untyped-defs
 
 lint-strict: install
 	$(VENV)/bin/flake8 .
